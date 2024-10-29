@@ -1,4 +1,7 @@
 # EterGame
+
+Echipa Alt+F4
+
 Tisca Laurentiu Stefan;
 Vicas Antonio Samir;
 Iacob Giulia;
