@@ -1,5 +1,5 @@
 # EterGame
-Tisca Laurentiu Stefan
-Vicas Antonio Samir
+#Tisca Laurentiu Stefan
+#Vicas Antonio Samir
 Iacob Giulia
 Tiba Stefan Vlad
