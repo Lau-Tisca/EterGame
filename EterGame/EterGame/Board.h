@@ -18,7 +18,8 @@ public:
 	}
 
 	void display();
-
+	uint8_t line();
+	uint8_t column();
 	
 	
 

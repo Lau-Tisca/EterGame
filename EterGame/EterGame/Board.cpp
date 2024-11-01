@@ -9,3 +9,13 @@ void Board:: display() {
 		std::cout << '\n';
 	}
 }
+
+uint8_t Board::line()
+{
+	return m_line;
+}
+
+uint8_t Board::column()
+{
+	return m_column;
+}
