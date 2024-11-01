@@ -10,12 +10,16 @@ void Board:: display() {
 	}
 }
 
-uint8_t Board::line()
+void Board::placeCard(card, line, column) {
+	board[][] = card
+}
+
+uint8_t Board::setLine()
 {
 	return m_line;
 }
 
-uint8_t Board::column()
+uint8_t Board::getColumn()
 {
 	return m_column;
 }

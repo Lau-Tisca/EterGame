@@ -17,9 +17,13 @@ public:
 		m_column = column;
 	}
 
+	uint8_t setLine();
+	uint8_t getColumn();
+	
+	void placeCard(card, line, column);
+	
 	void display();
-	uint8_t line();
-	uint8_t column();
+
 	
 	
 
