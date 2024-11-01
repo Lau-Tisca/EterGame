@@ -11,7 +11,7 @@ void Board:: display() {
 }
 
 void Board::placeCard(card, line, column) {
-	board[][] = card
+	board[][] = card;
 }
 
 uint8_t Board::setLine()
