@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <stack>
 
 class Board
 {
@@ -8,7 +9,7 @@ private:
 	//linii coloane
 	uint8_t m_line, m_column;
 	//matrix
-	std::vector<std::vector<Card>> board;
+	std::vector<std::vector<std::stack<int>>> board;
 
 public:
 	Board(uint8_t line, uint8_t column) {
