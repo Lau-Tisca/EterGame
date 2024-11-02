@@ -6,21 +6,26 @@
 class Board
 {
 private:
-	//linii coloane
+	//lines columns
 	uint8_t m_line, m_column;
-	//matrix
-	std::vector<std::vector<std::stack<int>>> board;
+	//board
+	std::vector<std::vector<std::stack<int>>> m_board;
 
 public:
-	Board(uint8_t line, uint8_t column) {
-		m_line = line;
-		m_column = column;
-	}
+	//constructors and destructor
+	Board();
+	Board(uint8_t line, uint8_t column);
+	Board(const Board& other);
+	~Board() = default;
+	
+	// operators
+	Board& operator=(const Board& other);
 
-	uint8_t setLine();
+	//getters
+	uint8_t getLine();
 	uint8_t getColumn();
 	
-	void placeCard(card, line, column);
+	void placeCard(PlayingCard card, uint8_t line, uint8_t column);
 	
 	void display();
 
