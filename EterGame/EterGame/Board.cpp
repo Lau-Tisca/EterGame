@@ -3,7 +3,7 @@
 
 Board::Board(){}
 
-Board::Board(uint8_t line, uint8_t column)
+Board::Board(uint8_t lineAndCols)
 	: m_lineAndCols(lineAndCols)
 {}
 
@@ -28,7 +28,7 @@ void Board:: display() {
 }
 
 void Board::placeCard(PlayingCard card, uint8_t line, uint8_t column) {
-	m_board[line][column].top() = card;
+	m_board[line][column].top() = card.getValue();
 }
 
 uint8_t Board::getLine()
