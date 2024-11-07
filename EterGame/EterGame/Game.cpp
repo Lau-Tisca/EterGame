@@ -19,7 +19,7 @@ void Game::nextTurn() {
 	currentPlayer = (currentPlayer + 1) % players.size();
 
 	// Afișează jucătorul curent
-	std::cout << "Este rândul jucătorului " << currentPlayer + 1 << std::endl;
+	std::cout << "It's the player's turn " << currentPlayer + 1 << std::endl;
 }
 
 void Game::saveGameState() {
