@@ -2,19 +2,20 @@
 #include <cstdint>
 #include <vector>
 #include <stack>
+#include "PlayingCard.h"
 
 class Board
 {
 private:
 	//lines columns
-	uint8_t m_line, m_column;
+	uint8_t m_lineAndCols;
 	//board
 	std::vector<std::vector<std::stack<int>>> m_board;
 
 public:
 	//constructors and destructor
 	Board();
-	Board(uint8_t line, uint8_t column);
+	Board(uint8_t lineAndCols);
 	Board(const Board& other);
 	~Board() = default;
 	
@@ -24,6 +25,9 @@ public:
 	//getters
 	uint8_t getLine();
 	uint8_t getColumn();
+
+	void setLine(uint8_t lineAndCols);
+	void setColumn(uint8_t lineAndCols);
 	
 	void placeCard(PlayingCard card, uint8_t line, uint8_t column);
 	
