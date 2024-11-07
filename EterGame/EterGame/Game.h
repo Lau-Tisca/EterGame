@@ -1,11 +1,25 @@
 #pragma once
+#include <vector>
 #include "Board.h"
+#include "Player.h"
 
 class Game {
 private:
-	int line, column;
+	std::vector<Player> players;
+	int currentPlayer;
+	Board board;
 public:
-	
+	Game(int linesAndCols) :
+		board(linesAndCols),
+		currentPlayer(0) {
 
-	Board board(line, column);
+	}
+
+	~Game() {}
+
+	void startGame();
+	void nextTurn();
+	void checkWinCondition();
+	void saveGameState();
+	void loadGameState();
 };
