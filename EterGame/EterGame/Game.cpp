@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include "Game.h"
 #include "Board.h"
 
@@ -12,4 +12,35 @@ void Game::startGame() {
 	currentPlayer = 0;
 
 	std::cout << "Game has started!\n";
+}
+
+void Game::nextTurn() {
+	// Avansează la următorul jucător
+	currentPlayer = (currentPlayer + 1) % players.size();
+
+	// Afișează jucătorul curent
+	std::cout << "Este rândul jucătorului " << currentPlayer + 1 << std::endl;
+}
+
+void Game::saveGameState() {
+    std::ofstream saveFile("game_state.txt");
+
+    if (saveFile.is_open()) {
+        // Salvează jucătorul curent
+        saveFile << currentPlayer << std::endl;
+
+        // Salvează starea fiecărui jucător
+        for (const auto& player : players) {
+            player.save(saveFile);  // Este necesar să ai o metodă save() în clasa Player
+        }
+
+        // Salvează starea tablei
+        board.save(saveFile);  // Este necesar să ai o metodă save() în clasa Board
+
+        saveFile.close();
+        std::cout << "Starea jocului a fost salvată." << std::endl;
+    }
+    else {
+        std::cerr << "Eroare la deschiderea fișierului pentru salvare!" << std::endl;
+    }
 }
