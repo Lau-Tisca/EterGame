@@ -14,10 +14,13 @@ private:
     int roundsWon;
 
 public:
-    Player(std::u8string _name, std::u8string _magicPower)
-        :name{_name},
-        magicPower{_magicPower}
-    {}
+    Player(std::u8string _name, std::u8string _magicPower) : 
+        name{_name},
+        magicPower{_magicPower} {
+
+    }
+    void resetDeck();
     void playcard();
+
 };
 

@@ -33,7 +33,7 @@ public:
 	
 	void display();
 
-	
+	void reset();
 	
 
 };
