@@ -44,3 +44,26 @@ void Game::saveGameState() {
         std::cerr << "Eroare la deschiderea fișierului pentru salvare!" << std::endl;
     }
 }
+
+void Game::loadGameState() {
+    std::ifstream loadFile("game_state.txt");
+
+    if (loadFile.is_open()) {
+        // Încarcă jucătorul curent
+        loadFile >> currentPlayer;
+
+        // Încarcă starea fiecărui jucător
+        for (auto& player : players) {
+            player.load(loadFile);  // Este necesar să ai o metodă load() în clasa Player
+        }
+
+        // Încarcă starea tablei
+        board.load(loadFile);  // Este necesar să ai o metodă load() în clasa Board
+
+        loadFile.close();
+        std::cout << "Starea jocului a fost încărcată." << std::endl;
+    }
+    else {
+        std::cerr << "Eroare la deschiderea fișierului pentru încărcare!" << std::endl;
+    }
+}
