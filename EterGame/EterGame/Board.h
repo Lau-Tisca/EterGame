@@ -10,7 +10,7 @@ private:
 	//lines columns
 	uint8_t m_lineAndCols;
 	//board
-	std::vector<std::vector<std::stack<int>>> m_board;
+	std::vector<std::vector<std::stack<PlayingCard>>> m_board;
 
 public:
 	//constructors and destructor
@@ -26,8 +26,7 @@ public:
 	uint8_t getLine();
 	uint8_t getColumn();
 
-	void setLine(uint8_t lineAndCols);
-	void setColumn(uint8_t lineAndCols);
+	void setLineAndColumns(uint8_t line);
 	
 	void placeCard(PlayingCard card, uint8_t line, uint8_t column);
 	

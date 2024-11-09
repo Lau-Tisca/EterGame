@@ -1,0 +1,55 @@
+tabla:
+
+	uint8_t n, m (dimensiune 3x3 sau 4x4);
+	matrice: elementele matricei sunt stive de tip carteDeJoc
+	
+	Metode:
+	verifyValidPositions;
+	verifyRoundWinner;
+	
+	
+	
+Joc:
+	
+	AlegeModuldeJoc -> (training mode, Wizards' duel, Elements' Duel, Tournament mode, Speed Mode), Start game;
+	guide();
+	exit();
+	
+TrainingMode: (seteaza dimneisunea de 3 a tablei, se joaca doar cu 7 carti: 1 1, 2 2, 3 3, 4, eter, 2/3)
+	uint8_t round;
+	string PlayersTurn;
+	VerifyWinner;
+	DecideWhoGoesFirst;
+	
+	
+class coordinates{
+	private:
+	int x,y;
+	public:
+	get x si y;
+}
+
+
+player:
+	string name;
+	string magicPower;
+	vector hand (mana pe care o tine in mana);
+	vector deck;
+	int score;
+	roundsWon;
+	
+	playcard:()
+	
+
+PlayingCard:{
+	uint_8 value;
+	string colour;
+	bool Side;
+	string type;
+	coordinates positionOnBoard;
+	}
+	
+EterCard : public playingCard{
+	
+}
+
