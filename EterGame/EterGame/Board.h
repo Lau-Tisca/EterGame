@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <algorithm>
 #include <stack>
 #include "PlayingCard.h"
 
@@ -28,9 +29,11 @@ public:
 
 	void setLineAndColumns(uint8_t line);
 	
+	bool verifyWinCondition();
 	bool verifyAdjacency(uint8_t line, uint8_t column);
 	void placeCard(PlayingCard card, uint8_t line, uint8_t column);
 	void display();
+
 
 	void reset();
 	

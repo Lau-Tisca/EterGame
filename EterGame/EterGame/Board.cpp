@@ -35,6 +35,17 @@ void Board::reset()
 
 
 
+bool Board::verifyWinCondition()
+{
+	for (int i = 0; i < m_lineAndCols; i++) {
+		if (std::find(m_board[i].begin(), m_board[i].end(), NULL) != m_board.end()) {
+			std::cout << "The board is full\n";
+			return true;
+		}
+	}
+
+}
+
 bool Board::verifyAdjacency(uint8_t line, uint8_t column)
 {
 	int rows = m_board.size();
@@ -48,7 +59,7 @@ bool Board::verifyAdjacency(uint8_t line, uint8_t column)
 		{-1, -1}, // up-left
 		{-1, 1},  // up_right
 		{1, -1},  // down-left
-		{1, 1}    // 
+		{1, 1}    // down-right
 	};
 
 	for (int d = 0; d < 8; ++d) {
