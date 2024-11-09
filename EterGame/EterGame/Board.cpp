@@ -33,12 +33,47 @@ void Board::reset()
 	m_board.resize(m_lineAndCols);
 }
 
-void Board::placeCard(PlayingCard card, uint8_t line, uint8_t column) {
-	if (m_board[line][column].empty()) {
-		m_board[line][column].emplace(card);
+
+
+bool Board::verifyAdjacency(uint8_t line, uint8_t column)
+{
+	int rows = m_board.size();
+	int cols = m_board[0].size();
+
+	int directions[8][2] = {
+		{-1, 0},  // up
+		{1, 0},   // down
+		{0, -1},  // left
+		{0, 1},   // right
+		{-1, -1}, // up-left
+		{-1, 1},  // up_right
+		{1, -1},  // down-left
+		{1, 1}    // 
+	};
+
+	for (int d = 0; d < 8; ++d) {
+		int nLine = line + directions[d][0];
+		int nColumn = column + directions[d][1];
+
+		if (nLine >= 0 && nLine < rows && nColumn >= 0 && nColumn < cols) {
+			if (m_board[nLine][nColumn].top() != NULL) {
+				return true;
+			}
+		}
 	}
-	else if (card.canBePlacedOver(m_board[line][column].top()) && card.getType() != PlayingCard::CardType::eter) {
+}
+
+void Board::placeCard(PlayingCard card, uint8_t line, uint8_t column) {
+	if (verifyAdjacency(line, column)) {
+		if (m_board[line][column].empty()) {
 			m_board[line][column].emplace(card);
+		}
+		else if (card.canBePlacedOver(m_board[line][column].top()) && card.getType() != PlayingCard::CardType::eter) {
+			m_board[line][column].emplace(card);
+		}
+	}
+	else {
+		std::cout << "You chose an invalid position!\n";
 	}
 }
 

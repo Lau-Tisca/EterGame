@@ -28,8 +28,8 @@ public:
 
 	void setLineAndColumns(uint8_t line);
 	
+	bool verifyAdjacency(uint8_t line, uint8_t column);
 	void placeCard(PlayingCard card, uint8_t line, uint8_t column);
-	
 	void display();
 
 	void reset();
