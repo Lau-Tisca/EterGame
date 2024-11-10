@@ -105,11 +105,26 @@ void Board::setLineAndColumns(uint8_t lineAndCols)
 }
 
 bool Board::checkForWinner() {
-	// Verificã rânduri
+	
 	for (const auto& row : grid) {
 		if (std::all_of(row.begin(), row.end(), [&](const Card* card) { return card != nullptr && card->getOwner() == row[0]->getOwner(); })) {
 			return true;
 		}
 	}
+	
+	for (size_t col = 0; col < grid[0].size(); ++col) {
+		if (std::all_of(grid.begin(), grid.end(), [&](const std::vector<Card*>& row) { return row[col] != nullptr && row[col]->getOwner() == grid[0][col]->getOwner(); })) {
+			return true;
+		}
+	}
+
+	
+	bool diag1 = true, diag2 = true;
+	for (size_t i = 0; i < grid.size(); ++i) {
+		diag1 &= (grid[i][i] != nullptr && grid[i][i]->getOwner() == grid[0][0]->getOwner());
+		diag2 &= (grid[i][grid.size() - i - 1] != nullptr && grid[i][grid.size() - i - 1]->getOwner() == grid[0][grid.size() - 1]->getOwner());
+	}
+
+	return diag1 || diag2;
 }
 	

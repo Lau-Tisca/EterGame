@@ -60,16 +60,14 @@ void Game::loadGameState() {
     std::ifstream loadFile("game_state.txt");
 
     if (loadFile.is_open()) {
-        // Încarcă jucătorul curent
+
         loadFile >> currentPlayer;
 
-        // Încarcă starea fiecărui jucător
         for (auto& player : players) {
-            player.load(loadFile);  // Este necesar să ai o metodă load() în clasa Player
+            player.load(loadFile);  
         }
 
-        // Încarcă starea tablei
-        board.load(loadFile);  // Este necesar să ai o metodă load() în clasa Board
+        board.load(loadFile); 
 
         loadFile.close();
         std::cout << "Starea jocului a fost încărcată." << std::endl;
