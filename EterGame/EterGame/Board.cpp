@@ -103,3 +103,13 @@ void Board::setLineAndColumns(uint8_t lineAndCols)
 	m_lineAndCols = lineAndCols;
 	m_board.resize(lineAndCols);
 }
+
+bool Board::checkForWinner() {
+	// Verificã rânduri
+	for (const auto& row : grid) {
+		if (std::all_of(row.begin(), row.end(), [&](const Card* card) { return card != nullptr && card->getOwner() == row[0]->getOwner(); })) {
+			return true;
+		}
+	}
+}
+	

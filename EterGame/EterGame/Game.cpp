@@ -14,6 +14,17 @@ void Game::startGame() {
 	std::cout << "Game has started!\n";
 }
 
+void Game::checkWinCondition() {
+    bool hasWinner = board.checkForWinner(); 
+
+    if (hasWinner) {
+        std::cout << "Jucătorul " << currentPlayer + 1 << " a câștigat!" << std::endl;
+    }
+    else {
+        std::cout << "Jocul continuă!" << std::endl;
+    }
+}
+
 void Game::nextTurn() {
 	// Avansează la următorul jucător
 	currentPlayer = (currentPlayer + 1) % players.size();
