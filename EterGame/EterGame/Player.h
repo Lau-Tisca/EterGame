@@ -25,5 +25,6 @@ public:
     void resetDeck();
     void playcard();
     void save(std::ofstream &saveFile) const;
+    void load(std::ifstream& loadFile) const;
 };
 

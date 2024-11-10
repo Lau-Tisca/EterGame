@@ -20,3 +20,17 @@ void Player::save(std::ofstream& saveFile) const {
     saveFile << std::endl;
     std::cout << "Starea jucătorului " << convertedName << " a fost salvată." << std::endl;
 }
+
+void Player::load(std::ifstream& loadFile) const {
+    loadFile >> name;
+    int decksize;
+    loadFile >> decksize;
+    deck.clear();
+    for (int i = 0; i < decksize; i++)
+    {
+        int cardValue;
+        loadFile >> cardValue;
+        deck.push_back(Card(cardValue));
+    }
+    std::cout << "Starea jucatorului " << name << "a fost incarcata" <<'\n';
+}
