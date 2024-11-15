@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include  "Board.h"
+#include <"Player.h">
 
 class Wizard
 {
@@ -18,7 +19,7 @@ public:
 	std::u8string getPowerName() const;
 
 	// Activeaza puterea vrajitorului
-	bool usePower(Board& board);
+	bool usePower(Board& board, Player& currentPlayer, Player& opponent);
 
 	// Reseteaza puterea
 	void resetPower();

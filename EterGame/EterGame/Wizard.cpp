@@ -20,6 +20,7 @@ bool Wizard::usePower(Board& board) {
         return false;
     }
 
+    //ecplozie
     if (m_power == "Explosion") {
         // Exemplu: Șterge toate cărțile dintr-un rând
         int row = 0;  // Aici poți primi input pentru a alege rândul
@@ -28,10 +29,22 @@ bool Wizard::usePower(Board& board) {
         }
         std::cout << "Explozie activată de " << std::string(m_name.begin(), m_name.end()) << "!" << std::endl;
     }
+
+    //ilussion
     else if (m_power == "Illusion") {
-        // Exemplu: Plasează o carte falsă
-        std::cout << std::string(m_name.begin(), m_name.end()) << " a plasat o carte iluzie!" << std::endl;
-    }
+        // Iluzie: Plasează o carte falsă
+        int row, col;
+        std::cout << "Alege poziția pentru cartea falsă (rând coloană): ";
+        std::cin >> row >> col;
+
+        if (board.isPositionValid(row, col)) {
+            board.placeIllusion(row, col);  // Metodă în Board pentru plasarea unei iluzii
+            std::cout << m_name << " a plasat o carte falsă la (" << row << ", " << col << ")!" << std::endl;
+        }
+        else {
+            std::cout << "Poziție invalidă!" << std::endl;
+            return false;
+        }
 
     m_powerUsed = true;  // Marchez că puterea a fost utilizată
     return true;
