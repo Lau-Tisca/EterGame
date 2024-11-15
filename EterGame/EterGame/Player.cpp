@@ -34,3 +34,24 @@ void Player::load(std::ifstream& loadFile) const {
     }
     std::cout << "Starea jucatorului " << name << "a fost incarcata" <<'\n';
 }
+
+PlayingCard Player::removeCard(int index)
+{
+    PlayingCard removedCard(hand[index]);
+    int hand_size = hand.size();
+    for (int i = 0;i < hand_size;i++)
+    {
+        if (i == index)
+        {
+            for (int j = i + 1;j <= hand_size;j++)
+                hand[j - 1] = hand[j];
+        }
+    }
+
+
+    return removedCard;
+}
+
+void Player::addCard(PlayingCard card)
+{
+}
