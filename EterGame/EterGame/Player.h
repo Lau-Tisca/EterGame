@@ -22,6 +22,7 @@ public:
         magicPower{_magicPower} {
 
     }
+    std::uint16_t getDeckSize();
     void resetDeck();
     void playcard();
     void save(std::ofstream &saveFile) const;
