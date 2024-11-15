@@ -14,14 +14,15 @@ std::u8string Wizard::getPowerName() const {
 }
 
 // puterile
-bool Wizard::usePower(Board& board) {
+bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
     if (m_powerUsed) {
         std::cout << "Puterea vrăjitorului " << std::string(m_name.begin(), m_name.end()) << " a fost deja utilizată!" << std::endl;
         return false;
     }
 
-    //ecplozie
-    if (m_power == "Explosion") {
+    std::string convertedPower(m_power.begin(), m_power.end());
+    //explozie
+    if (convertedPower == "Explosion") {
         // Exemplu: Șterge toate cărțile dintr-un rând
         int row = 0;  // Aici poți primi input pentru a alege rândul
         for (auto& cell : board.getLine()) {
@@ -31,7 +32,7 @@ bool Wizard::usePower(Board& board) {
     }
 
     //ilussion
-    else if (m_power == "Illusion") {
+    else if (convertedPower == "Illusion") {
         // Iluzie: Plasează o carte falsă
         int row, col;
         std::cout << "Alege poziția pentru cartea falsă (rând coloană): ";
@@ -39,13 +40,34 @@ bool Wizard::usePower(Board& board) {
 
         if (board.isPositionValid(row, col)) {
             board.placeIllusion(row, col);  // Metodă în Board pentru plasarea unei iluzii
-            std::cout << m_name << " a plasat o carte falsă la (" << row << ", " << col << ")!" << std::endl;
+            std::cout << std::string(m_name.begin(), m_name.end()) << " a plasat o carte falsă la (" << row << ", " << col << ")!" << std::endl;
         }
         else {
             std::cout << "Poziție invalidă!" << std::endl;
             return false;
         }
+    }
+
+    else if (convertedPower == "Freeze") {
+        // Freeze: Blochează o poziție
+        int row, col;
+        std::cout << "Alege poziția pentru a fi înghețată (rând coloană): ";
+        std::cin >> row >> col;
+
+        if (board.isPositionValid(row, col)) {
+            board.freezeCell(row, col);  // Metodă în Board pentru înghețare
+            std::cout << std::string(m_name.begin(), m_name.end()) << " a înghețat poziția (" << row << ", " << col << ")!" << std::endl;
+        }
+        else {
+            std::cout << "Poziție invalidă!" << std::endl;
+            return false;
+        }
+    }
+
+    
 
     m_powerUsed = true;  // Marchez că puterea a fost utilizată
     return true;
+
+
 }
