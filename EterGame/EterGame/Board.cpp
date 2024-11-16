@@ -18,6 +18,14 @@ Board& Board::operator=(const Board& other)
 	m_board = other.m_board;
 }
 
+bool Board::operator==(const Board& other)
+{
+	if (m_lineAndCols == other.m_lineAndCols;
+		m_board == other.m_board)
+		return true;
+	else return false;
+}
+
 void Board::display() {
 	for (int i = 0; i < m_lineAndCols; ++i) {
 		for (int j = 0; j < m_lineAndCols; ++j) {
@@ -38,20 +46,20 @@ void Board::reset()
 bool Board::verifyWinCondition()
 {
 	for (int i = 0; i < m_lineAndCols; i++) {
-		if (std::find(m_board[i].begin(), m_board[i].end(), NULL) != m_board.end()) {
+		if (std::find(m_board[i].begin(), m_board[i].end(), nullptr) != m_board[i].end()) {
 			std::cout << "The board is full\n";
 			return true;
 		}
 	}
 
 	for (const auto& row : m_board) {
-		if (std::all_of(row.begin(), row.end(), [&](const PlayingCard* card) { return card != nullptr && card->getOwner() == row[0]->getOwner(); })) {
+		if (std::all_of(row.begin(), row.end(), [&](const PlayingCard* card) { return card != nullptr && card->getOwner() == row[0].top().getOwner(); })) {
 			return true;
 		}
 	}
 
 	for (size_t col = 0; col < m_board[0].size(); ++col) {
-		if (std::all_of(m_board.begin(), m_board.end(), [&](const std::vector<PlayingCard*>& row) { return row[col] != nullptr && row[col]->getOwner() == grid[0][col]->getOwner(); })) {
+		if (std::all_of(m_board.begin(), m_board.end(), [&](const std::vector<PlayingCard*>& row) { return row[col] != nullptr && row[col]->getOwner() == m_board[0][col].top().getOwner(); })) {
 			return true;
 		}
 	}

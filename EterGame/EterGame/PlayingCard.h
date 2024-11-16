@@ -12,8 +12,8 @@ public:
 	
 	bool operator==(const PlayingCard& other);
 
-	std::string printCardType(CardType value);
-	std::ostream& operator<<(std::ostream& os);
+	static std::string printCardType(CardType value);
+	friend std::ostream& operator<<(std::ostream& os, const PlayingCard& other);
 	uint8_t getValue() const;
 	CardType getType() const;
 	uint8_t getX() const;

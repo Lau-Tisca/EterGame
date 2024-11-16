@@ -34,16 +34,21 @@ std::string PlayingCard::printCardType(CardType value)
 	switch (value){
 	case CardType::numbered:
 		return "numbered";
+		break;
 	case CardType::eter:
 		return "eter";
+		break;
+	default:
+		return "unknown";
 	}
 }
 
-std::ostream& PlayingCard::operator<<(std::ostream& os)
+std::ostream& operator<<(std::ostream& os, const PlayingCard& other)
 {
-	os << m_value << printCardType(m_type) << m_x << m_y << m_owner;
-		return os;
+	os << other.m_value << other.printCardType(other.m_type) << other.m_x << other.m_y << other.m_owner;
+	return os;
 }
+
 
 uint8_t PlayingCard::getValue () const
 {
@@ -85,3 +90,4 @@ bool PlayingCard::canBePlacedOver(const PlayingCard& other) const
 {
 	return m_value > other.m_value && other.getType() != CardType::eter;
 }
+

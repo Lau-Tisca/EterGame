@@ -6,6 +6,15 @@ Player::Player(std::u8string _name, std::u8string _magicPower)
 	m_deck.clear();
 }
 
+Player::Player(const Player& other)
+	: m_name(other.m_name)
+	, m_magicPower(other.m_magicPower)
+	, m_hand(other.m_hand)
+	, m_deck(other.m_deck)
+	, m_score(other.m_score)
+	, m_roundsWon(other.m_roundsWon)
+{}
+
 void Player::playcard()
 {
 
@@ -40,13 +49,16 @@ bool Player::operator==(const Player& other) const
 	if (m_name == other.m_name && m_magicPower == other.m_magicPower && m_hand == other.m_hand &&
 		m_deck == other.m_deck && m_score == other.m_score && m_roundsWon == other.m_roundsWon)
 		return true;
-	else 
+	else
 		return false;
 }
 
+
+
+
 PlayingCard Player::removeCard(int index)
 {
-	PlayingCard removedCard(hand[index]);
+	PlayingCard removedCard(m_hand[index]);
 	int hand_size = hand.size();
 	for (int i = 0; i < hand_size; i++)
 	{
@@ -63,4 +75,16 @@ PlayingCard Player::removeCard(int index)
 
 void Player::addCard(PlayingCard card)
 {
+}
+
+std::ostream& operator<<(std::ostream& os, const Player& other)
+{
+	os << std::string(reinterpret_cast<const char*>(other.m_name.data()), other.m_name.size()) <<
+		std::string(reinterpret_cast<const char*>(other.m_magicPower.data()), other.m_magicPower.size());
+	for (int i = 0; i < other.m_hand.size(); i++)
+		os << other.m_hand[i];
+	for (int i = 0; i < other.m_deck.size(); i++)
+		os << other.m_deck[i];
+	os << other.m_score << other.m_roundsWon;
+	return os;
 }

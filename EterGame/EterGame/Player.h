@@ -19,9 +19,9 @@ private:
 public:
     Player(std::u8string _name, std::u8string _magicPower) : 
         m_name{_name},
-        m_magicPower{_magicPower} {
-
+        m_magicPower{_magicPower}{
     }
+    Player(const Player& other);
     std::uint16_t getDeckSize();
     void resetDeck();
     void playcard();
@@ -29,5 +29,6 @@ public:
     void load(std::ifstream& loadFile) const;
 
     bool operator == (const Player & other) const;
+    friend std::ostream& operator<<(std::ostream& os, const Player& other);
 };
 
