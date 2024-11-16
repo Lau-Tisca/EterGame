@@ -26,8 +26,9 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
     if (convertedPower == "Explosion") {
         // Exemplu: Șterge toate cărțile dintr-un rând
         int row = 0;  // Aici poți primi input pentru a alege rândul
-        for (auto& cell : board.getLine()) {
-            cell = nullptr;
+        for (auto& cell : board.getLine(row)) {
+            while (!cell.empty()){
+                cell.pop();
         }
         std::cout << "Explozie activată de " << convertedName << "!" << std::endl;
     }

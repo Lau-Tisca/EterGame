@@ -86,8 +86,17 @@ void PlayingCard::setCardOwner(Player otherOwner)
 	m_owner = otherOwner;
 }
 
+void PlayingCard::setCardType(CardType type)
+{
+	m_type = type;
+}
+
 bool PlayingCard::canBePlacedOver(const PlayingCard& other) const
 {
 	return m_value > other.m_value && other.getType() != CardType::eter;
 }
 
+void PlayingCard::destroyCard()
+{
+	this->~PlayingCard();
+}

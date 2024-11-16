@@ -71,7 +71,7 @@ bool Board::verifyWinCondition()
 			diag1 = false;
 	}
 	for (int i = m_board[0].size(); i > 0; i--) {
-		if (m_board[i][getLine() - 1 - i].top().getOwner() != m_board[i][getLine() - 1 - i].top().getOwner())
+		if (m_board[i][getLinesAndColumns() - 1 - i].top().getOwner() != m_board[i][getLinesAndColumns() - 1 - i].top().getOwner())
 			diag2 = false;
 	}
 
@@ -113,7 +113,15 @@ void Board::placeCard(PlayingCard card, uint8_t line, uint8_t column) {
 			m_board[line][column].emplace(card);
 		}
 		else if (card.canBePlacedOver(m_board[line][column].top()) && card.getType() != PlayingCard::CardType::eter) {
-			m_board[line][column].emplace(card);
+			if (card.getType() == PlayingCard::CardType::illusion) {
+				if (card.canBePlacedOver(m_board[line][column].top()))
+					m_board[line][column].emplace(card);
+				else
+					card.destroyCard();
+			}
+			else {
+				m_board[line][column].emplace(card);
+			}
 		}
 	}
 	else {
@@ -121,18 +129,43 @@ void Board::placeCard(PlayingCard card, uint8_t line, uint8_t column) {
 	}
 }
 
-uint8_t Board::getLine()
+void Board::placeIllusion(const PlayingCard& card, uint8_t line, uint8_t column)
+{
+	if (verifyAdjacency(line, column)) {
+		if (m_board[line][column].empty()) {
+			m_board[line][column].emplace(card);
+			m_board[line][column].top().setCardType(PlayingCard::CardType::illusion);
+		}
+	}
+}
+
+uint8_t Board::getLinesAndColumns()
 {
 	return m_lineAndCols;
 }
 
-uint8_t Board::getColumn()
+std::vector<std::stack<PlayingCard>> Board::getLine(uint8_t row)
 {
-	return m_lineAndCols;
+	std::vector<std::stack<PlayingCard>> rowToReturn;
+	rowToReturn = m_board[row];
+
+	return rowToReturn;
 }
+
 
 void Board::setLineAndColumns(uint8_t lineAndCols)
 {
 	m_lineAndCols = lineAndCols;
 	m_board.resize(lineAndCols);
 }
+
+std::ostream& operator<<(std::ostream& os, const Board& current)
+{
+	for (int i = 0; i < current.m_lineAndCols; ++i) {
+		for (int j = 0; j < current.m_lineAndCols; ++j) {
+			os << current.m_board[i][j].top() << ' ';
+		}
+		os << '\n';
+	}
+}
+

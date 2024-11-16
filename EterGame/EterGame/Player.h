@@ -24,6 +24,7 @@ public:
     Player(const Player& other);
     std::uint16_t getDeckSize();
     void resetDeck();
+    
     void playcard();
     void save(std::ofstream &saveFile) const;
     void load(std::ifstream& loadFile) const;
