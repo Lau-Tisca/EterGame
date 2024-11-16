@@ -9,17 +9,17 @@
 class Player
 {
 private:
-    std::u8string name;
-    std::u8string magicPower;
-    std::vector<PlayingCard> hand;//(mana pe care o tine in mana);
-    std::vector<PlayingCard> deck;
-    int score;
-    int roundsWon;
+    std::u8string m_name;
+    std::u8string m_magicPower;
+    std::vector<PlayingCard> m_hand;//(mana pe care o tine in mana);
+    std::vector<PlayingCard> m_deck;
+    int m_score;
+    int m_roundsWon;
 
 public:
     Player(std::u8string _name, std::u8string _magicPower) : 
-        name{_name},
-        magicPower{_magicPower} {
+        m_name{_name},
+        m_magicPower{_magicPower} {
 
     }
     std::uint16_t getDeckSize();
@@ -27,5 +27,7 @@ public:
     void playcard();
     void save(std::ofstream &saveFile) const;
     void load(std::ifstream& loadFile) const;
+
+    bool operator == (const Player & other) const;
 };
 

@@ -44,6 +44,31 @@ bool Board::verifyWinCondition()
 		}
 	}
 
+	for (const auto& row : m_board) {
+		if (std::all_of(row.begin(), row.end(), [&](const PlayingCard* card) { return card != nullptr && card->getOwner() == row[0]->getOwner(); })) {
+			return true;
+		}
+	}
+
+	for (size_t col = 0; col < m_board[0].size(); ++col) {
+		if (std::all_of(m_board.begin(), m_board.end(), [&](const std::vector<PlayingCard*>& row) { return row[col] != nullptr && row[col]->getOwner() == grid[0][col]->getOwner(); })) {
+			return true;
+		}
+	}
+
+
+	bool diag1 = true, diag2 = true;
+	for (int i = 0; i < m_board[0].size() - 1; i++) {
+		if (m_board[i][i].top().getOwner() != m_board[i + 1][i + 1].top().getOwner())
+			diag1 = false;
+	}
+	for (int i = m_board[0].size(); i > 0; i--) {
+		if (m_board[i][getLine() - 1 - i].top().getOwner() != m_board[i][getLine() - 1 - i].top().getOwner())
+			diag2 = false;
+	}
+
+	return diag1 || diag2;
+
 }
 
 bool Board::verifyAdjacency(uint8_t line, uint8_t column)
@@ -67,7 +92,7 @@ bool Board::verifyAdjacency(uint8_t line, uint8_t column)
 		int nColumn = column + directions[d][1];
 
 		if (nLine >= 0 && nLine < rows && nColumn >= 0 && nColumn < cols) {
-			if (m_board[nLine][nColumn].top() != NULL) {
+			if (!m_board[nLine][nColumn].empty()) {
 				return true;
 			}
 		}
@@ -103,28 +128,3 @@ void Board::setLineAndColumns(uint8_t lineAndCols)
 	m_lineAndCols = lineAndCols;
 	m_board.resize(lineAndCols);
 }
-
-bool Board::checkForWinner() {
-	
-	for (const auto& row : grid) {
-		if (std::all_of(row.begin(), row.end(), [&](const Card* card) { return card != nullptr && card->getOwner() == row[0]->getOwner(); })) {
-			return true;
-		}
-	}
-	
-	for (size_t col = 0; col < grid[0].size(); ++col) {
-		if (std::all_of(grid.begin(), grid.end(), [&](const std::vector<Card*>& row) { return row[col] != nullptr && row[col]->getOwner() == grid[0][col]->getOwner(); })) {
-			return true;
-		}
-	}
-
-	
-	bool diag1 = true, diag2 = true;
-	for (size_t i = 0; i < grid.size(); ++i) {
-		diag1 &= (grid[i][i] != nullptr && grid[i][i]->getOwner() == grid[0][0]->getOwner());
-		diag2 &= (grid[i][grid.size() - i - 1] != nullptr && grid[i][grid.size() - i - 1]->getOwner() == grid[0][grid.size() - 1]->getOwner());
-	}
-
-	return diag1 || diag2;
-}
-	
