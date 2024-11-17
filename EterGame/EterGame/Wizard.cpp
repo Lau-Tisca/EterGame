@@ -93,3 +93,34 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
 
 
 }
+
+    else if(convertedPower == "RemoveStackCoveringOwnCard") {
+        // Elimină o carte a adversarului care acoperă o carte proprie
+        int row, col;
+        std::cout << "Alege poziția de unde să elimini teancul (rând coloană): ";
+        std::cin >> row >> col;
+
+        if (board.hasOwnCardBelow(row, col, currentPlayer)) { //trebuie implementate in board functiile hasOwnCardBelow si RemoveStack
+            board.removeStack(row, col);
+            std::cout << "Teancul de la (" << row << ", " << col << ") a fost eliminat!" << std::endl;
+        }
+        else {
+            std::cout << "Nu există o carte proprie dedesubt la poziția aleasă!" << std::endl;
+            return false;
+        }
+    }
+    else if (convertedPower == "RemoveRowWithOwnCard") {
+        // Elimină un întreg rând care conține cel puțin 3 poziții și o carte proprie vizibilă
+        int row;
+        std::cout << "Alege rândul pentru eliminare: ";
+        std::cin >> row;
+
+        if (board.isValidRowForRemoval(row, currentPlayer)) { //trebuie implementate functiile in board
+            board.removeRow(row);
+            std::cout << "Rândul " << row << " a fost eliminat!" << std::endl;
+        }
+        else {
+            std::cout << "Rândul ales nu îndeplinește condițiile pentru eliminare!" << std::endl;
+            return false;
+        }
+    }
