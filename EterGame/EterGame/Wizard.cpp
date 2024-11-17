@@ -123,4 +123,28 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
             std::cout << "Rândul ales nu îndeplinește condițiile pentru eliminare!" << std::endl;
             return false;
         }
+
     }
+    else if (convertedPower == "CoverOpponentCard") {
+        // Acoperă o carte a oponentului cu o carte proprie de valoare strict mai mică
+        int row, col, cardIndex;
+        std::cout << "Alege poziția adversarului (rând coloană) și cartea din mână: ";
+        std::cin >> row >> col >> cardIndex;
+
+        if (currentPlayer.hasCard(cardIndex) && board.isOpponentCardOnTop(row, col, opponent)) {
+            auto selectedCard = currentPlayer.getCard(cardIndex);
+            if (selectedCard.getValue() < board.getTopCard(row, col).getValue()) {
+                board.placeCard(row, col, selectedCard);
+                currentPlayer.removeCard(cardIndex);
+                std::cout << "Cartea a fost plasată peste adversar la (" << row << ", " << col << ")." << std::endl;
+            }
+            else {
+                std::cout << "Cartea selectată nu are o valoare strict mai mică decât cea a adversarului!" << std::endl;
+                return false;
+            }
+        }
+        else {
+            std::cout << "Poziția sau cartea aleasă nu este validă!" << std::endl;
+            return false;
+        }
+        }
