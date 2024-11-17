@@ -147,4 +147,34 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
             std::cout << "Poziția sau cartea aleasă nu este validă!" << std::endl;
             return false;
         }
+    }
+    else if (convertedPower == "CreatePit") {
+        // Transformă un spațiu gol într-o groapă
+        int row, col;
+        std::cout << "Alege poziția pentru a crea o groapă (rând coloană): ";
+        std::cin >> row >> col;
+
+        if (board.isPositionEmpty(row, col)) {
+            board.createPit(row, col);
+            std::cout << "Groapa a fost creată la (" << row << ", " << col << ")." << std::endl;
         }
+        else {
+            std::cout << "Poziția aleasă nu este goală!" << std::endl;
+            return false;
+        }
+        }
+    else if (convertedPower == "MoveOwnStack") {
+            // Mută un teanc cu o carte proprie deasupra pe o altă poziție goală
+            int fromRow, fromCol, toRow, toCol;
+            std::cout << "Alege poziția teancului propriu (rând coloană) și poziția de destinație (rând coloană): ";
+            std::cin >> fromRow >> fromCol >> toRow >> toCol;
+
+            if (board.canMoveOwnStack(fromRow, fromCol, toRow, toCol, currentPlayer)) {
+                board.moveStack(fromRow, fromCol, toRow, toCol);
+                std::cout << "Teancul a fost mutat la (" << toRow << ", " << toCol << ")." << std::endl;
+            }
+            else {
+                std::cout << "Mutarea nu este validă!" << std::endl;
+                return false;
+            }
+            }
