@@ -170,3 +170,46 @@ void Game::start() {
 
 
 }
+
+void Game::validateInput(int& row, int& col) {
+    while (true) {
+        std::cout << "Enter row and column (0-" << board.getSize() - 1 << "): ";
+        if (std::cin >> row >> col && row >= 0 && row < board.getSize() && col >= 0 && col < board.getSize()) {
+            break;
+        }
+        else {
+            std::cout << "Invalid input. Try again.\n";
+            std::cin.clear(); // Curăță eroarea
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignoră restul liniei
+        }
+    }
+}
+
+void Game::validateCardIndex(int& index, const Player& player) {
+    while (index < 0 || index >= player.hand.size()) {
+        std::cout << "Invalid card index! Enter a valid index (1-" << player.hand.size() << "): ";
+        std::cin >> index;
+        index -= 1; // Ajustează indexul pentru a începe de la 0
+    }
+}
+
+void Game::initializePlayers() {
+    for (int i = 0; i < 2; ++i) {
+        player1.addCard(Card(1));
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        player2.addCard(Card(1));
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        player1.addCard(Card(2));
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        player2.addCard(Card(2));
+    }
+
+    player1.addCard(Card(3, true));  // Iluzie
+    player2.addCard(Card(3, true));  // Iluzie
+}
