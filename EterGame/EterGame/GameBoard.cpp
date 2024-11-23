@@ -1,3 +1,4 @@
+#include "GameBoard.h"
 #include "PlayingCard.h"
 
 PlayingCard::PlayingCard(uint8_t Value, CardType Type, uint8_t x, uint8_t y, Player owner) : 
