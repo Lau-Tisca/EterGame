@@ -131,3 +131,42 @@ void Game::start() {
                 continue;
             }
         }
+
+        std::cout << activePlayer.name << "'s turn. Select row and column (e.g., 1 1): ";
+        int row, col;
+        validateInput(row, col);
+
+        std::cout << "Select card index from hand (1-" << activePlayer.hand.size() << "): ";
+        int cardIndex;
+        std::cin >> cardIndex;
+        cardIndex -= 1; // Ajustare pentru vectorul intern
+        validateCardIndex(cardIndex, activePlayer);
+
+        if (cardIndex >= 0 && cardIndex < activePlayer.hand.size()) {
+            Card card = activePlayer.hand[cardIndex];
+            if (board.placeCard(row, col, card, activePlayer)) {
+                activePlayer.removeCard(cardIndex);
+
+                // Activează explozia, dacă e cazul
+                if (board.triggerExplosion(activePlayer)) {
+                    continue;
+                }
+
+                // Verifică condiția de câștig
+                std::string winCondition = board.checkWinCondition(activePlayer);
+                if (!winCondition.empty()) {
+                    std::cout << activePlayer.name << " wins by " << winCondition << "!\n";
+                    break;
+                }
+
+                // Schimbă rândul jucătorului
+                currentPlayer = (currentPlayer == 1) ? 2 : 1;
+            }
+            else {
+                std::cout << "Invalid move. Try again.\n";
+            }
+        }
+    }
+
+
+}
