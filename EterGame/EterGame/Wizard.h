@@ -1,29 +1,18 @@
 #pragma once
 #include <string>
-#include  "Board.h"
+#include "MagicPower.h"
+#include "GameBoard.h"
 #include "Player.h"
 
-class Wizard
-{
-private:
-	std::u8string m_name;
-	std::u8string m_power;
-	bool m_powerUsed;
-
+class Wizard {
 public:
-	// Constructor
-	Wizard(const std::u8string& name, const std::u8string& power);
+    std::string name;
+    MagicPower power;
+    bool usedThisGame;
+    bool usedThisMatch;
+    std::string abilityDescription;
 
-	//getteri
-	std::u8string getName() const;
-	std::u8string getPowerName() const;
-
-	// Activeaza puterea vrajitorului
-	bool usePower(Board& board, Player& currentPlayer, Player& opponent);
-
-	// Reseteaza puterea
-	void resetPower();
-
-	void usePower(Board board) {}
+    Wizard(const std::string& name, MagicPower power);
+    void useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1);
+    void resetGame();
 };
-
