@@ -30,9 +30,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameBoard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -47,7 +44,7 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameBoard.h">
+    <ClInclude Include="C:\Users\aquab\Downloads\EterClase\EterClase\EterClase\GameBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

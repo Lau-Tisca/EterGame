@@ -130,15 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayingCard.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Wizard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="C:\Users\aquab\Downloads\EterClase\EterClase\EterClase\GameBoard.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GameBoard.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayingCard.h" />
     <ClInclude Include="Wizard.h" />
