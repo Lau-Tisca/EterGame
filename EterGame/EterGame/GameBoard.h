@@ -1,38 +1,51 @@
 #pragma once
-#include <cstdint>
+#include <vector>
+#include <optional>
+#include <string>
+#include <stdexcept>
+#include <iostream>
+#include <utility>
+#include <algorithm>
+#include <cstdlib> // pentru rand()
+#include <ctime>   // pentru srand()
+#include "Card.h"
 #include "Player.h"
 
-class PlayingCard
-{
-public:
-	enum class CardType { numbered, eter, illusion};
-	PlayingCard(uint8_t Value, CardType Type, uint8_t x = -1, uint8_t y = -1, Player owner); //constructor
-	PlayingCard(const PlayingCard& other);     //constructor de copiere	
-	~PlayingCard(){}
-	void operator=(const PlayingCard& other);
-	
-	bool operator==(const PlayingCard& other);
-
-	static std::string printCardType(CardType value);
-	friend std::ostream& operator<<(std::ostream& os, const PlayingCard& other);
-
-	uint8_t getValue() const;
-	CardType getType() const;
-	uint8_t getX() const;
-	uint8_t getY() const;
-	Player getOwner() const;
-
-	void setCardPosition(uint8_t x, uint8_t y);
-	void setCardOwner(Player otherOwner);
-	void setCardType(CardType type);
-
-	bool canBePlacedOver(const PlayingCard& other) const;
-	void destroyCard();
+class GameBoard {
 private:
-	uint8_t m_value;
-	CardType m_type;
-	uint8_t m_x, m_y;
-	Player m_owner;
-	//coordonatele cartii de joc in matrice
-};
+    int size;
+    std::vector<std::vector<std::optional<Card>>> board;
+    std::vector<std::pair<int, int>> holes; // Pozi?iile „gropilor”
 
+    bool isValidPosition(int row, int col) const;
+
+public:
+    GameBoard(int size);
+    int getSize() const;
+
+    void addHole(int row, int col);
+
+    void createHole(int row, int col);
+    bool isHole(int row, int col) const;
+
+    bool placeCard(int row, int col, const Card card, const Player& currentPlayer);
+    std::string checkWinCondition(const Player& player) const;
+
+    void printBoard() const;
+
+    bool triggerExplosion(Player& currentPlayer);
+
+    void removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer);
+    void removeRowWithOwnCard(int row, const Player& currentPlayer);
+    void coverOpponentCard(int row, int col, Player& currentPlayer);
+    void moveStackWithOwnCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer);
+    void placeEtherCard(int row, int col, const Player& currentPlayer);
+    void moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer);
+    void moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol);
+
+private:
+    bool explosionOccurred = false; //Initializat ca false
+    bool checkLine(const Player& player, int startRow, int startCol, int dRow, int dCol) const;
+    bool isLineFull(int startRow, int startCol, int dRow, int dCol) const;
+    std::vector<std::pair<int, int>> generateExplosionPattern();
+};
