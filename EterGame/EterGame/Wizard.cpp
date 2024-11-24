@@ -210,3 +210,26 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
             return false;
         }
         }
+    else if (m_power == "MoveEdgeRow") {
+        // Mută un rând de la marginea tablei pe o altă margine
+        int fromEdge, toEdge;
+        std::cout << "Alege marginea sursă și marginea destinație (0 = sus, 1 = jos, 2 = stânga, 3 = dreapta): ";
+        std::cin >> fromEdge >> toEdge;
+
+        if (board.canMoveEdgeRow(fromEdge, toEdge, currentPlayer)) {
+            board.moveEdgeRow(fromEdge, toEdge);
+            std::cout << "Rândul de la marginea " << fromEdge << " a fost mutat la marginea " << toEdge << "." << std::endl;
+        }
+        else {
+            std::cout << "Mutarea rândului nu este validă!" << std::endl;
+            return false;
+        }
+        }
+    else {
+            std::cout << "Puterea " << m_power << " nu este implementată!" << std::endl;
+            return false;
+            }
+
+            m_powerUsed = true;
+            return true;
+}
