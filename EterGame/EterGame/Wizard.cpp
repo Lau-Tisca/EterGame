@@ -178,3 +178,19 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
                 return false;
             }
             }
+    else if (m_power == "ExtraEterCard") {
+        // Capătă o carte Eter suplimentară și o plasează imediat
+        int row, col;
+        std::cout << "Alege poziția pentru a plasa cartea Eter: ";
+        std::cin >> row >> col;
+
+        if (board.isPositionEmpty(row, col)) {
+            auto eterCard = currentPlayer.getExtraEterCard();
+            board.placeCard(row, col, eterCard);
+            std::cout << "Cartea Eter a fost plasată la (" << row << ", " << col << ")." << std::endl;
+        }
+        else {
+            std::cout << "Poziția aleasă nu este goală!" << std::endl;
+            return false;
+        }
+        }
