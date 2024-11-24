@@ -194,3 +194,19 @@ bool Wizard::usePower(Board& board, Player& currentPlayer, Player& opponent) {
             return false;
         }
         }
+
+    else if (m_power == "MoveOpponentStack") {
+        // Mută un teanc de cărți cu cartea adversarului deasupra pe o altă poziție goală
+        int fromRow, fromCol, toRow, toCol;
+        std::cout << "Alege poziția teancului adversarului (rând coloană) și poziția de destinație (rând coloană): ";
+        std::cin >> fromRow >> fromCol >> toRow >> toCol;
+
+        if (board.canMoveOpponentStack(fromRow, fromCol, toRow, toCol, opponent)) {
+            board.moveStack(fromRow, fromCol, toRow, toCol);
+            std::cout << "Teancul adversarului a fost mutat la (" << toRow << ", " << toCol << ")." << std::endl;
+        }
+        else {
+            std::cout << "Mutarea nu este validă!" << std::endl;
+            return false;
+        }
+        }
