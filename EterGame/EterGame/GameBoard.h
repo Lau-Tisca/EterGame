@@ -15,7 +15,7 @@ class GameBoard {
 private:
     int size;
     std::vector<std::vector<std::optional<Card>>> board;
-    std::vector<std::pair<int, int>> holes; // Pozi?iile „gropilor”
+    std::vector<std::pair<int, int>> holes; // Pozitiile „gropilor”
 
     bool isValidPosition(int row, int col) const;
 

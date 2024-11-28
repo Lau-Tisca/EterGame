@@ -1,17 +1,13 @@
 ﻿#include "Wizard.h"
 #include <iostream>
 
-Wizard::Wizard(const std::string& name, MagicPower power)
+Wizard::Wizard(const std::u8string& name, MagicPower power)
     : name(name), power(power) {
 }
 
 // Getteri
 std::u8string Wizard::getName() const {
     return name;
-}
-
-std::u8string Wizard::getPowerName() const {
-    return power;
 }
 
 // puterile

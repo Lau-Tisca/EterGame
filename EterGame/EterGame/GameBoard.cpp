@@ -91,7 +91,7 @@ void GameBoard::printBoard() const {
 }
 
 bool GameBoard::triggerExplosion(Player& currentPlayer) {
-    if (explosionOcuured) {
+    if (explosionOccurred) {
         std::cout << "Explosion has already occured. No other can happen.\n";
         return false;
     }
@@ -107,7 +107,7 @@ bool GameBoard::triggerExplosion(Player& currentPlayer) {
 
     // Actualizează starea pentru a preveni alte explozii
     if (fullLines >= 2) {
-        explosionOcuured = true;
+        explosionOccurred = true;
     }
 
     // Alege o carte de explozie aleatorie (3x3 sau 4x4 în funcție de dimensiunea tablei)
@@ -125,16 +125,6 @@ bool GameBoard::triggerExplosion(Player& currentPlayer) {
                 board[row][col].reset();
             }
             else {
-                /*std::cout << " - (" << row << ", " << col << "): Card with value "
-                    << board[row][col]->value << " returned to "
-                    << currentPlayer.name << "'s hand.\n";
-                currentPlayer.addCard(*board[row][col]);
-                board[row][col].reset();*/
-
-                /* Întoarce cartea în mâna jucătorului---
-                    s-a modificat pentru ca jucatorul ce
-                    foloseste explozia sa nu ajunga sa
-                    aibe prea multe carti in mana */
                 if (currentPlayer.hand.size() < 10) {
                     std::cout << " - (" << row << ", " << col << "): Card with value "
                         << board[row][col]->value << " returned to "

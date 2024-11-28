@@ -1,10 +1,12 @@
 #include <iostream>
+#include "Game.h"
+#include "GameBoard.h"
+#include "Player.h"
+#include "Wizard.h"
 
 int main() {
-	std::cout << "kasjkjashkj\n";
-	std::cout << "dada ";
-	std::cout << "\ntEST din partea mea";
-
+	
+	srand(static_cast<unsigned>(time(0)));
 
 	return 0;
 }

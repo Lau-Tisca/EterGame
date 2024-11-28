@@ -6,17 +6,15 @@
 
 class Wizard {
 public:
-    std::string name;
+    const std::u8string name;
     MagicPower power;
     bool usedThisGame;
     bool usedThisMatch;
-    std::string abilityDescription;
+    static std::string abilityDescription;
 
-    Wizard(const std::string& name, MagicPower power);
+    Wizard(const std::u8string& name, MagicPower power);
     void useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1);
     void resetGame();
 
     std::u8string getName() const {}
-    
-    std::u8string getPowerName() const {}
 };
