@@ -15,4 +15,8 @@ public:
     Wizard(const std::string& name, MagicPower power);
     void useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1);
     void resetGame();
+
+    std::u8string getName() const {}
+    
+    std::u8string getPowerName() const {}
 };
