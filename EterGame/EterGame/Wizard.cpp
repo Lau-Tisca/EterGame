@@ -1,5 +1,11 @@
-﻿#include "Wizard.h"
+﻿#include "MagicPower.h"
+#include "Wizard.h"
+#include "GameBoard.h"
+#include "Player.h"
+
+#include <stdexcept>
 #include <iostream>
+#include <string>
 
 Wizard::Wizard(const std::u8string& name, MagicPower power)
     : name(name), power(power) {
