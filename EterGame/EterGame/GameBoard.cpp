@@ -50,8 +50,8 @@ bool GameBoard::placeCard(int row, int col, const Card card, const Player& curre
         return true;
     }*/
 
-    if (!board[row][col].empty() || board[row][col].top().value < card.value) {
-        board[row][col].top() = Card(card.value, card.isIllusion, card.isEther, currentPlayer.name); // Creează o copie cu proprietar setat
+    if (!board[row][col].empty() || board[row][col].top().getValue() < card.getValue()) {
+        board[row][col].top() = Card(card.getValue(), card.isIllusion, card.isEther, currentPlayer.name); // Creează o copie cu proprietar setat
         return true;
     }
     return false;
@@ -84,7 +84,7 @@ void GameBoard::printBoard() const {
                 std::cout << "H "; // „H” pentru groapă
             }
             else if (board[i][j].empty()) {
-                std::cout << (board[i][j].top().isIllusion ? "I" : std::to_string(board[i][j].top().value)) << " ";
+                std::cout << (board[i][j].top().isIllusion ? "I" : std::to_string(board[i][j].top().getValue())) << " ";
             }
             else {
                 std::cout << ". ";
@@ -125,19 +125,19 @@ bool GameBoard::triggerExplosion(Player& currentPlayer) {
             if (rand() % 2 == 0) {
                 // Elimină cartea din joc
                 std::cout << " - (" << row << ", " << col << "): Card with value "
-                    << board[row][col].top().value << " removed from play.\n";
+                    << board[row][col].top().getValue() << " removed from play.\n";
                 board[row][col].reset();
             }
             else {
                 if (currentPlayer.hand.size() < 10) {
                     std::cout << " - (" << row << ", " << col << "): Card with value "
-                        << board[row][col].top().value << " returned to "
+                        << board[row][col].top().getValue() << " returned to "
                         << currentPlayer.name << "'s hand.\n";
                     currentPlayer.addCard(board[row][col].top());
                 }
                 else {
                     std::cout << " - (" << row << ", " << col << "): Card with value "
-                        << board[row][col].top().value << " cannot be returned; hand is full.\n";
+                        << board[row][col].top().getValue() << " cannot be returned; hand is full.\n";
                 }
                 board[row][col].reset();
             }
@@ -173,7 +173,7 @@ void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
     // Găsește o carte proprie de valoare strict mai mică
     auto it = std::find_if(currentPlayer.hand.begin(), currentPlayer.hand.end(),
         [&](const Card& card) {
-            return card.value < topCard.value && !card.isIllusion;
+            return card.getValue() < topCard.getValue() && !card.isIllusion;
         });
 
     if (it == currentPlayer.hand.end()) {
@@ -181,13 +181,13 @@ void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
     }
 
     // Plasează cartea proprie peste cea a oponentului
-    board[row][col].top() = Card(it->value, it->isIllusion, it->isEther, currentPlayer.name);
+    board[row][col].top() = Card(it->getValue(), it->isIllusion, it->isEther, currentPlayer.name);
 
     // Elimină cartea din mână
     currentPlayer.removeCard(std::distance(currentPlayer.hand.begin(), it));
 
     std::cout << "Covered opponent's card at (" << row << ", " << col
-        << ") with your card of value " << board[row][col].top().value << ".\n";
+        << ") with your card of value " << board[row][col].top().getValue() << ".\n";
 }
 
 /*
@@ -230,7 +230,7 @@ void GameBoard::placeEtherCard(int row, int col, const Player& currentPlayer) {
     }
 
     // Plasează cartea Eter pe tablă
-    board[row][col] = Card(0, false, true, currentPlayer.name);
+    board[row][col].top() = Card(0, false, true, currentPlayer.name);
     std::cout << "Placed Ether card at (" << row << ", " << col << ") for " << currentPlayer.name << ".\n";
 }
 
@@ -404,11 +404,11 @@ void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& curren
         throw std::runtime_error("Invalid position on the board!");
     }
 
-    if (!board[row][col].has_value()) {
+    if (!board[row][col].empty()) {
         throw std::runtime_error("No card at the given position to remove!");
     }
 
-    const Card& topCard = *board[row][col];
+    const Card& topCard = board[row][col].top();
     if (topCard.owner == currentPlayer.name) {
         throw std::runtime_error("Cannot remove your own card!");
     }
@@ -416,7 +416,7 @@ void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& curren
     // Verificăm dacă există o carte proprie dedesubt
     bool hasOwnCardBelow = false;
     for (int i = row + 1; i < size; ++i) {
-        if (board[i][col].has_value() && board[i][col]->owner == currentPlayer.name) {
+        if (board[i][col].empty() && board[i][col].top().owner == currentPlayer.name) {
             hasOwnCardBelow = true;
             break;
         }
@@ -441,9 +441,9 @@ void GameBoard::removeRowWithOwnCard(int row, const Player& currentPlayer) {
     bool hasOwnCard = false;
 
     for (int col = 0; col < size; ++col) {
-        if (board[row][col].has_value()) {
+        if (board[row][col].empty()) {
             ++occupiedPositions;
-            if (board[row][col]->owner == currentPlayer.name) {
+            if (board[row][col].top().owner == currentPlayer.name) {
                 hasOwnCard = true;
             }
         }

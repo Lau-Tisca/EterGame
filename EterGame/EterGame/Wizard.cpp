@@ -27,7 +27,7 @@ std::u8string Wizard::getName() const {
 }
 
 // puterile
-void Wizard::useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow, int destCol) {
+void Wizard::useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1) {
     if (usedThisMatch) {
         throw std::runtime_error("The magical power has already been used this match!");
     }
