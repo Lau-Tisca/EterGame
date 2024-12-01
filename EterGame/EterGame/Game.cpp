@@ -36,7 +36,7 @@ void Game::start() {
                     int row;
                     std::cin >> row;
 
-                    activePlayer.wizard.useAbility(board, row, -1, activePlayer);
+                    activePlayer.wizard.useAbility(board, row, -1, activePlayer,-1,-1);
 
                     currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă rândul
                     continue;
@@ -46,7 +46,7 @@ void Game::start() {
                     int row, col;
                     std::cin >> row >> col;
 
-                    activePlayer.wizard.useAbility(board, row, col, activePlayer);
+                    activePlayer.wizard.useAbility(board, row, col, activePlayer,-1,-1);
 
                     currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă rândul
                     continue;
@@ -56,7 +56,7 @@ void Game::start() {
                     int row, col;
                     std::cin >> row >> col;
 
-                    activePlayer.wizard.useAbility(board, row, col, activePlayer);
+                    activePlayer.wizard.useAbility(board, row, col, activePlayer,-1,-1);
 
                     currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă rândul
                     continue;
@@ -67,7 +67,7 @@ void Game::start() {
                     std::cin >> row >> col;
 
                     try {
-                        activePlayer.wizard.useAbility(board, row, col, activePlayer);
+                        activePlayer.wizard.useAbility(board, row, col, activePlayer,-1,-1);
                         currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă rândul
                     }
                     catch (const std::exception& e) {
@@ -99,7 +99,7 @@ void Game::start() {
                     std::cin >> row >> col;
 
                     try {
-                        activePlayer.wizard.useAbility(board, row, col, activePlayer);
+                        activePlayer.wizard.useAbility(board, row, col, activePlayer,-1,-1);
                         currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă rândul
                     }
                     catch (const std::exception& e) {

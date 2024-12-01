@@ -16,6 +16,11 @@ Wizard::Wizard(const std::u8string& name, MagicPower power)
     : name(name), power(power) {
 }
 
+std::ostream& operator<<(std::ostream& os, const std::u8string& u8str)
+{
+    return os << std::string(u8str.begin(), u8str.end());
+}
+
 // Getteri
 std::u8string Wizard::getName() const {
     return name;

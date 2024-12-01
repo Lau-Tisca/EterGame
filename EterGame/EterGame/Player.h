@@ -2,9 +2,9 @@
 #include <vector>
 #include <string>
 #include "Card.h"
-#include "Wizard.h"
 #include "GameBoard.h"
 
+#include "Wizard.h"
 class Player {
 public:
     std::string name;

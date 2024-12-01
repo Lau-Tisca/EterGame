@@ -2,7 +2,8 @@
 #include <string>
 #include "MagicPower.h"
 #include "GameBoard.h"
-#include "Player.h"
+
+std::ostream& operator<<(std::ostream& os, const std::u8string& u8str);
 
 class Wizard {
 public:
@@ -15,6 +16,5 @@ public:
     Wizard(const std::u8string& name, MagicPower power);
     void useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1);
     void resetGame();
-
     std::u8string getName() const {}
 };
