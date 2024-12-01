@@ -430,3 +430,36 @@ void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& curren
     board[row][col].reset();
     std::cout << "Removed opponent's card at (" << row << ", " << col << ").\n";
 }
+
+void GameBoard::removeRowWithOwnCard(int row, const Player& currentPlayer) {
+    if (row < 0 || row >= size) {
+        throw std::runtime_error("Invalid row index!");
+    }
+
+    // Verifică dacă rândul îndeplinește condițiile
+    int occupiedPositions = 0;
+    bool hasOwnCard = false;
+
+    for (int col = 0; col < size; ++col) {
+        if (board[row][col].has_value()) {
+            ++occupiedPositions;
+            if (board[row][col]->owner == currentPlayer.name) {
+                hasOwnCard = true;
+            }
+        }
+    }
+
+    if (occupiedPositions < 3) {
+        throw std::runtime_error("The row must occupy at least 3 positions!");
+    }
+    if (!hasOwnCard) {
+        throw std::runtime_error("The row must contain at least one of your cards!");
+    }
+
+    // Elimină toate cărțile din rând
+    for (int col = 0; col < size; ++col) {
+        board[row][col].reset();
+    }
+
+    std::cout << "Removed all cards from row " << row << ".\n";
+}

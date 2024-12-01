@@ -44,6 +44,7 @@ public:
     void moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer);
     void moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol);
     void removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer);
+    void removeRowWithOwnCard(int row, const Player& currentPlayer);
 
 private:
     bool explosionOccurred = false; //Initializat ca false
