@@ -10,11 +10,13 @@
 #include <ctime>   // pentru srand()
 #include "Card.h"
 #include "Player.h"
+#include <stack>
+#include <vector>
 
 class GameBoard {
 private:
     int size;
-    std::vector<std::vector<std::optional<Card>>> board;
+    std::vector<std::vector<std::stack<Card>>> board;
     std::vector<std::pair<int, int>> holes; // Pozitiile „gropilor”
 
     bool isValidPosition(int row, int col) const;
@@ -35,8 +37,7 @@ public:
 
     bool triggerExplosion(Player& currentPlayer);
 
-    void removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer);
-    void removeRowWithOwnCard(int row, const Player& currentPlayer);
+    
     void coverOpponentCard(int row, int col, Player& currentPlayer);
     void moveStackWithOwnCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer);
     void placeEtherCard(int row, int col, const Player& currentPlayer);
