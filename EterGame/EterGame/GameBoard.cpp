@@ -398,3 +398,35 @@ std::vector<std::pair<int, int>> GameBoard::generateExplosionPattern() {
 
     return positions;
 }
+
+void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer) {
+    if (!isValidPosition(row, col)) {
+        throw std::runtime_error("Invalid position on the board!");
+    }
+
+    if (!board[row][col].has_value()) {
+        throw std::runtime_error("No card at the given position to remove!");
+    }
+
+    const Card& topCard = *board[row][col];
+    if (topCard.owner == currentPlayer.name) {
+        throw std::runtime_error("Cannot remove your own card!");
+    }
+
+    // Verificăm dacă există o carte proprie dedesubt
+    bool hasOwnCardBelow = false;
+    for (int i = row + 1; i < size; ++i) {
+        if (board[i][col].has_value() && board[i][col]->owner == currentPlayer.name) {
+            hasOwnCardBelow = true;
+            break;
+        }
+    }
+
+    if (!hasOwnCardBelow) {
+        throw std::runtime_error("No own card below the opponent's card!");
+    }
+
+    // Eliminăm cartea de deasupra
+    board[row][col].reset();
+    std::cout << "Removed opponent's card at (" << row << ", " << col << ").\n";
+}
