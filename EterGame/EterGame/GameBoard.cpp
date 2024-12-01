@@ -137,7 +137,7 @@ bool GameBoard::triggerExplosion(Player& currentPlayer) {
                 }
                 else {
                     std::cout << " - (" << row << ", " << col << "): Card with value "
-                        << board[row][col]->value << " cannot be returned; hand is full.\n";
+                        << board[row][col].top().value << " cannot be returned; hand is full.\n";
                 }
                 board[row][col].reset();
             }
@@ -160,12 +160,12 @@ void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
         throw std::runtime_error("Invalid position on the board!");
     }
 
-    if (!board[row][col].has_value()) {
+    if (!board[row][col].empty()) {
         throw std::runtime_error("No card at the given position to cover!");
     }
 
     // Verifică dacă este o carte a oponentului
-    const Card& topCard = *board[row][col];
+    const Card& topCard = board[row][col].top();
     if (topCard.owner == currentPlayer.name) {
         throw std::runtime_error("You cannot cover your own card!");
     }
@@ -181,13 +181,13 @@ void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
     }
 
     // Plasează cartea proprie peste cea a oponentului
-    board[row][col] = Card(it->value, it->isIllusion, it->isEther, currentPlayer.name);
+    board[row][col].top() = Card(it->value, it->isIllusion, it->isEther, currentPlayer.name);
 
     // Elimină cartea din mână
     currentPlayer.removeCard(std::distance(currentPlayer.hand.begin(), it));
 
     std::cout << "Covered opponent's card at (" << row << ", " << col
-        << ") with your card of value " << board[row][col]->value << ".\n";
+        << ") with your card of value " << board[row][col].top().value << ".\n";
 }
 
 /*
@@ -198,15 +198,15 @@ void GameBoard::moveStackWithOwnCard(int srcRow, int srcCol, int destRow, int de
         throw std::runtime_error("Invalid position on the board!");
     }
 
-    if (!board[srcRow][srcCol].has_value()) {
+    if (!board[srcRow][srcCol].empty()) {
         throw std::runtime_error("No stack exists at the source position!");
     }
 
-    if (board[destRow][destCol].has_value()) {
+    if (board[destRow][destCol].empty()) {
         throw std::runtime_error("The destination position is not empty!");
     }
 
-    const Card& topCard = *board[srcRow][srcCol];
+    const Card& topCard =board[srcRow][srcCol].top();
     if (topCard.owner != currentPlayer.name) {
         throw std::runtime_error("You can only move stacks where your card is on top!");
     }
@@ -225,7 +225,7 @@ void GameBoard::placeEtherCard(int row, int col, const Player& currentPlayer) {
     if (!isValidPosition(row, col) || isHole(row, col)) {
         throw std::runtime_error("Cannot place Ether card on this position!");
     }
-    if (board[row][col].has_value()) {
+    if (board[row][col].empty()) {
         throw std::runtime_error("Position already occupied!");
     }
 
@@ -242,15 +242,15 @@ void GameBoard::moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, i
         throw std::runtime_error("Invalid position on the board!");
     }
 
-    if (!board[srcRow][srcCol].has_value()) {
+    if (!board[srcRow][srcCol].empty()) {
         throw std::runtime_error("No stack exists at the source position!");
     }
 
-    if (board[destRow][destCol].has_value() || isHole(destRow, destCol)) {
+    if (board[destRow][destCol].empty() || isHole(destRow, destCol)) {
         throw std::runtime_error("The destination position is not empty or is a hole!");
     }
 
-    const Card& topCard = *board[srcRow][srcCol];
+    const Card& topCard = board[srcRow][srcCol].top();
     if (topCard.owner == currentPlayer.name) {
         throw std::runtime_error("You can only move stacks where the opponent's card is on top!");
     }
@@ -277,14 +277,14 @@ void GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) 
     int occupiedPositions = 0;
     if (srcRow == 0 || srcRow == size - 1) { // Mutare pe orizontală
         for (int col = 0; col < size; ++col) {
-            if (board[srcRow][col].has_value()) {
+            if (board[srcRow][col].empty()) {
                 ++occupiedPositions;
             }
         }
     }
     else if (srcCol == 0 || srcCol == size - 1) { // Mutare pe verticală
         for (int row = 0; row < size; ++row) {
-            if (board[row][srcCol].has_value()) {
+            if (board[row][srcCol].empty()) {
                 ++occupiedPositions;
             }
         }
@@ -300,14 +300,14 @@ void GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) 
     // Verifică dacă destinația este goală
     if (destRow == 0 || destRow == size - 1) { // Mutare pe orizontală
         for (int col = 0; col < size; ++col) {
-            if (board[destRow][col].has_value()) {
+            if (board[destRow][col].empty()) {
                 throw std::runtime_error("Destination row is not empty!");
             }
         }
     }
     else if (destCol == 0 || destCol == size - 1) { // Mutare pe verticală
         for (int row = 0; row < size; ++row) {
-            if (board[row][destCol].has_value()) {
+            if (board[row][destCol].empty()) {
                 throw std::runtime_error("Destination column is not empty!");
             }
         }
@@ -353,7 +353,7 @@ bool GameBoard::checkLine(const Player& player, int startRow, int startCol, int 
         if (count == size) return true;
         */
 
-        if (!board[row][col].has_value() || board[row][col]->owner != player.name) {
+        if (!board[row][col].empty() || board[row][col].top().owner != player.name) {
             return false;
         }
     }
@@ -365,7 +365,7 @@ bool GameBoard::isLineFull(int startRow, int startCol, int dRow, int dCol) const
         int row = startRow + i * dRow;
         int col = startCol + i * dCol;
 
-        if (!isValidPosition(row, col) || !board[row][col].has_value()) {
+        if (!isValidPosition(row, col) || !board[row][col].empty()) {
             return false;
         }
     }
