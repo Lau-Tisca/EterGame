@@ -11,6 +11,9 @@ private:
     Player player2;
     int currentPlayer; // 1 pentru player1, 2 pentru player2
 
+    void validateInput(int& row, int& col);
+    void validateCardIndex(int& index, const Player& player);
+    void initializePlayers();
 public:
     Game(int boardSize,
         const std::string& player1Name,
@@ -20,9 +23,6 @@ public:
 
     void resetGame();
     void start();
-
-private:
-    void validateInput(int& row, int& col);
-    void validateCardIndex(int& index, const Player& player);
-    void initializePlayers();
+    bool placeIllusion(Player& activePlayer, GameBoard& board);
+    bool placeNormalCard(Player& activePlayer, GameBoard& board, Player& opponent);
 };
