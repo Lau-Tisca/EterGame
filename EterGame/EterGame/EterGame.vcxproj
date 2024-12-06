@@ -140,6 +140,7 @@
     <ClInclude Include="Card.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameBoard.h" />
+    <ClInclude Include="MagicPower.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Wizard.h" />
   </ItemGroup>
