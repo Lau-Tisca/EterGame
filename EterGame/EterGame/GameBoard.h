@@ -53,9 +53,16 @@ public:
     void placeEtherCard(int row, int col, const Player& currentPlayer);
     void moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer);
     void moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol);
+    
+    void controlledExplosion(Player& currentPlayer);
+    void destruction(Player& opponent);
+    void flames(Player& opponent, Player& currentPlayer);
+    void lava(int number);
+
     int calculateScore(const Player& player) const;
     bool checkIllusionRule(int row, int col, Player& opponent);
     void printBoard() const;
     std::vector<std::pair<int, int>> generateExplosionPattern();
 
 private:
+}

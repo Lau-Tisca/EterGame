@@ -334,6 +334,14 @@ void GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) 
         << ") to edge (" << destRow << ", " << destCol << ").\n";
 }
 
+void GameBoard::controlledExplosion(Player& currentPlayer)
+{
+    int holeCount = 0;
+    auto pattern = ExplosionPattern::generateExplosionPattern(size, holeCount);
+    applyExplosion(pattern, holeCount);
+    std::cout << "Controlled explosion activated!\n";
+}
+
 bool GameBoard::checkLine(const Player& player, int startRow, int startCol, int dRow, int dCol) const {
     //int count = 0;
     for (int i = 0; i < size; ++i) {
@@ -495,4 +503,17 @@ void GameBoard::flames(Player& opponent, Player& currentPlayer) {
     board[row][col] = currentPlayer.hand.back(); // Joacă o carte
     currentPlayer.hand.pop_back();
     std::cout << "Card placed at (" << row << ", " << col << ").\n";
+}
+
+void GameBoard::lava(int number) {
+    for (auto& row : board) {
+        for (auto& cell : row) {
+            if (cell && cell->value == number) {
+                Player* owner = (cell->owner == "Player 1") ? &player1 : &player2;
+                owner->addCard(*cell);
+                cell.reset();
+            }
+        }
+    }
+    std::cout << "Lava activated: Cards with number " << number << " returned to owners' hands.\n";
 }
