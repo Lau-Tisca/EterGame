@@ -38,7 +38,7 @@ public:
     void createHole(int row, int col);
     bool isHole(int row, int col) const;
 
-    bool placeCard(int row, int col, const Card card, Player& currentPlayer);
+    bool placeCard(int row, int col, const Card card, const Player& currentPlayer);
     std::string checkWinCondition(const Player& player) const;
 
     void applyExplosion(const std::vector<std::pair<int, int>>& positions, int holeCount);
