@@ -12,6 +12,7 @@
 #include "Player.h"
 #include <stack>
 #include <vector>
+#include "ExplosionPattern.h"
 
 class GameBoard {
 private:
@@ -58,6 +59,7 @@ public:
     void destruction(Player& opponent);
     void flames(Player& opponent, Player& currentPlayer);
     void lava(int number);
+
 
     int calculateScore(const Player& player) const;
     bool checkIllusionRule(int row, int col, Player& opponent);

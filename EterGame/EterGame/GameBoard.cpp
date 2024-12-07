@@ -535,7 +535,55 @@ int GameBoard::calculateScore(const Player& player) const
 	return score;
 }
 
-bool GameBoard::checkIllusionRule(int row, int col, Player& opponent)
-{
-	return false;
+bool GameBoard::checkIllusionRule(int row, int col, Player& opponent) {
+	if (!isValidPosition(row, col)) {
+		throw std::runtime_error("Invalid position on the board!");
+	}
+
+	if (!board[row][col].has_value()) {
+		throw std::runtime_error("No card at the given position!");
+	}
+
+	// Obține o referință modificabilă la carte
+	auto& placedCard = board[row][col].value();
+
+	if (!placedCard.isIllusion) {
+		return false; // Nu este o iluzie
+	}
+
+	// Întoarce cartea iluzie cu fața în sus și verifică regulile
+	std::cout << "Illusion revealed at (" << row << ", " << col << ")!\n";
+	placedCard.isIllusion = false; // Iluzia devine o carte normală
+
+	// Verifică dacă oponentul încearcă să acopere iluzia
+	if (!opponent.hand.empty()) {
+		// Găsește o carte din mâna oponentului
+		int cardIndex;
+		std::cout << "Select a card from your hand to attempt covering the illusion (1-"
+			<< opponent.hand.size() << "): ";
+		std::cin >> cardIndex;
+		cardIndex -= 1; // Ajustează indexul pentru vector
+
+		if (cardIndex < 0 || cardIndex >= opponent.hand.size()) {
+			throw std::runtime_error("Invalid card index!");
+		}
+
+		const Card& opponentCard = opponent.hand[cardIndex];
+
+		if (opponentCard.value <= placedCard.value) {
+			// Cartea oponentului este eliminată
+			std::cout << "Opponent's card (value " << opponentCard.value
+				<< ") is eliminated!\n";
+			opponent.removeCard(cardIndex); // Elimină cartea din mână
+			return true; // Oponentul își încheie tura
+		}
+		else {
+			std::cout << "Opponent successfully covered the illusion with card of value "
+				<< opponentCard.value << ".\n";
+			board[row][col] = opponentCard; // Plasează cartea oponentului pe tablă
+			opponent.removeCard(cardIndex); // Elimină cartea din mână
+		}
+	}
+
+	return true; // Oponentul nu poate continua tura
 }
