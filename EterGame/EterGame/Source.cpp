@@ -23,8 +23,8 @@ void trainingMode() {
     std::cout << "Starting Training Mode...\n";
 
     // Crearea vrăjitorilor "default" pentru acest mod
-    Wizard wizard1("Training Wizard 1", MagicPower::GAIN_EXTRA_CARD);
-    Wizard wizard2("Training Wizard 2", MagicPower::MOVE_ROW_TO_EDGE);
+    Wizard wizard1(u8"Training Wizard 1", MagicPower::GAIN_EXTRA_CARD);
+    Wizard wizard2(u8"Training Wizard 2", MagicPower::MOVE_ROW_TO_EDGE);
 
     // Crearea jocului cu tabla 3x3
     Game game(3, "Player 1", "Player 2", wizard1, wizard2);

@@ -463,3 +463,36 @@ void GameBoard::removeRowWithOwnCard(int row, const Player& currentPlayer) {
 
     std::cout << "Removed all cards from row " << row << ".\n";
 }
+
+void GameBoard::destruction(Player& opponent) {
+    if (opponent.hand.empty()) {
+        throw std::runtime_error("Opponent has no cards to destroy!");
+    }
+    opponent.hand.pop_back();
+    std::cout << "Destruction activated: The last card of the opponent is eliminated.\n";
+}
+
+void GameBoard::flames(Player& opponent, Player& currentPlayer) {
+    for (auto& row : board) {
+        for (auto& cell : row) {
+            if (cell && cell->isIllusion && cell->owner == opponent.name) {
+                cell->isIllusion = false; // Dezvăluie iluzia
+                std::cout << "Illusion revealed!\n";
+                break;
+            }
+        }
+    }
+
+    int row, col;
+    std::cout << "Enter the position to play a card (row and col): ";
+    std::cin >> row >> col;
+
+    if (!isValidPosition(row, col) || board[row][col]) {
+        throw std::runtime_error("Invalid position to play a card.");
+    }
+
+    currentPlayer.addCard(Card(1));
+    board[row][col] = currentPlayer.hand.back(); // Joacă o carte
+    currentPlayer.hand.pop_back();
+    std::cout << "Card placed at (" << row << ", " << col << ").\n";
+}
