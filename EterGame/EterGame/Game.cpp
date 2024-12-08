@@ -257,3 +257,25 @@ bool Game::placeNormalCard(Player& activePlayer, GameBoard& board, Player& oppon
 
     Card card = activePlayer.hand[cardIndex];
 
+    try {
+        if (board.placeCard(row, col, card, activePlayer)) {
+            activePlayer.removeCard(cardIndex); // Elimină cartea din mână
+
+            // Verificare regulă iluzie
+            if (card.isIllusion && board.checkIllusionRule(row, col, opponent)) {
+                std::cout << "Illusion revealed! Opponent's turn ends.\n";
+            }
+            return true; // Plasarea a fost reușită
+        }
+        else {
+            std::cout << "Invalid move. Try again.\n";
+        }
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
+
+    return false; // Plasarea a eșuat
+}
+
+
