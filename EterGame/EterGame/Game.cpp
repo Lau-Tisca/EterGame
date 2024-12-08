@@ -239,3 +239,21 @@ bool Game::placeIllusion(Player& activePlayer, GameBoard& board) {
 
     return false; // Plasarea a eșuat
 }
+
+bool Game::placeNormalCard(Player& activePlayer, GameBoard& board, Player& opponent) {
+    std::cout << activePlayer.name << "'s turn. Select row and column (e.g., 1 1): ";
+    int row, col;
+    std::cin >> row >> col;
+
+    std::cout << "Select card index from hand (1-" << activePlayer.hand.size() << "): ";
+    int cardIndex;
+    std::cin >> cardIndex;
+    cardIndex -= 1; // Ajustare pentru vectorul intern
+
+    if (cardIndex < 0 || cardIndex >= activePlayer.hand.size()) {
+        std::cout << "Invalid card index!\n";
+        return false;
+    }
+
+    Card card = activePlayer.hand[cardIndex];
+
