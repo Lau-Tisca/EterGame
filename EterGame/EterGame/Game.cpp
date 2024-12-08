@@ -213,3 +213,29 @@ void Game::initializePlayers() {
     player1.addCard(Card(3, true));  // Iluzie
     player2.addCard(Card(3, true));  // Iluzie
 }
+
+bool Game::placeIllusion(Player& activePlayer, GameBoard& board) {
+    if (activePlayer.hasPlacedIllusion) {
+        std::cout << "You have already placed an Illusion this game!\n";
+        return false; // Jucătorul nu poate plasa altă iluzie
+    }
+
+    std::cout << "Enter the row and column to place the illusion: ";
+    int row, col;
+    std::cin >> row >> col;
+
+    try {
+        if (board.placeCard(row, col, Card(1, true, false, activePlayer.name), activePlayer)) {
+            activePlayer.hasPlacedIllusion = true; // Marchează utilizarea iluziilor
+            return true; // Plasarea a fost reușită
+        }
+        else {
+            std::cout << "Invalid move. Cannot place an illusion there.\n";
+        }
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
+
+    return false; // Plasarea a eșuat
+}
