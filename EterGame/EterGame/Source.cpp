@@ -1,22 +1,81 @@
-﻿#include <iostream>
-#include "Game.h"
-#include "Wizard.h"
-#include "MagicPower.h"
+﻿#include "Game.h"
+#include <iostream>
+#include <stdlib.h>
+#include <Windows.h>
 
+void clearConsole();
+
+// Mod antrenament
 void trainingMode();
+// Duel vrajitori
 void wizardsDuel();
+//Duel elemente
+
+// Modul turneu
+
 
 int main() {
-    srand(static_cast<unsigned>(time(0)));
+    /*
 
-    Wizard wizard1(u8"Fire Mage", MagicPower::REMOVE_ROW_WITH_OWN_CARD);
-    Wizard wizard2(u8"Ice Mage", MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN);
+    Wizard wizard1("Fire Mage", MagicPower::REMOVE_ROW_WITH_OWN_CARD);
+    Wizard wizard2("Ice Mage", MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN);
 
     Game game(3, "Player1", "Player2", wizard1, wizard2);
     game.start();
+    */
+    srand(static_cast<unsigned>(time(0)));
 
+    unsigned short int choice = 0;
 
-	return 0;
+    do {
+        clearConsole();
+        std::cout << "/------------------------------------\\\n";
+        std::cout << "| What gamemode do you want to play? |\n";
+        std::cout << "| 1. Training Mode                   |\n";
+        std::cout << "| 2. Wizard's Duel                   |\n";
+        std::cout << "| 3. Element's Duel                  |\n";
+        std::cout << "| 4. Tournament                      |\n";
+        std::cout << "| 5. Speed Mode                      |\n";
+        std::cout << "| 6. Exit Game                       |\n";
+        std::cout << "\\------------------------------------/\n\n";
+
+        std::cout << "Choice: ";
+        if (!(std::cin >> choice)) {
+            // Dacă intrarea nu este numerică
+            std::cin.clear();                // Curățăm starea de eroare
+            std::cin.ignore(1000, '\n');     // Golim bufferul până la finalul liniei
+            std::cout << "\nInvalid input. Please enter a number between 1 and 6.\n\n";
+            continue;                        // Reia bucla
+        }
+
+        std::cout << '\n';
+
+        switch (choice) {
+        case 1:
+            trainingMode();
+            break;
+        case 2:
+            wizardsDuel();
+            break;
+        case 3:
+            //elementsDuel();
+            break;
+        case 4:
+            //tournamentMode();
+            break;
+        case 5:
+            //speedMode();
+            break;
+        case 6:
+            std::cout << "Leaving Game.\n\n";
+            break;
+        default:
+            std::cout << "Invalid choice. Please try again.\n\n";
+            break;
+        }
+    } while (choice != 6);
+
+    return 0;
 }
 
 void trainingMode() {
