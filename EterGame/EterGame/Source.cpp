@@ -128,7 +128,9 @@ void clearConsole() {
     SetConsoleCursorPosition(hConsole, { 0, 0 });*/
 }
 
+// Mod antrenament
 void trainingMode() {
+    clearConsole();
     std::cout << "Starting Training Mode...\n";
 
     // Crearea vrăjitorilor "default" pentru acest mod
@@ -137,13 +139,7 @@ void trainingMode() {
 
     // Crearea jocului cu tabla 3x3
     Game game(3, "Player 1", "Player 2", wizard1, wizard2);
-
-    // Configurarea cărților pentru jucători
     for (int i = 0; i < 2; ++i) {
-        game.getPlayer1().addCard(Card(1));
-        game.getPlayer2().addCard(Card(1));
-        game.getPlayer1().addCard(Card(2));
-        game.getPlayer2().addCard(Card(2));
         game.getPlayer1().addCard(Card(3));
         game.getPlayer2().addCard(Card(3));
     }
@@ -154,35 +150,114 @@ void trainingMode() {
     int player1Wins = 0;
     int player2Wins = 0;
 
-    while (player1Wins < 2 && player2Wins < 2) {
-        game.resetGame(); // Resetează jocul pentru un nou meci
-        game.start();     // Începe jocul
+    // Configurarea cărților pentru jucători
+    //1 card
+    std::cout << "Player 1: Place first card.   Select card index from hand (1-" << game.getPlayer1().hand.size() << "): \n";
+    for (int i = 0; i < game.getPlayer1().hand.size(); i++)
+        if (!game.getPlayer1().hand[i].isIllusion)
+            std::cout << "[" << i + 1 << "]:" << game.getPlayer1().hand[i] << " ";
+    std::cout << "\n";
 
-        // Calcularea scorurilor
-        int player1Score = game.getBoard().calculateScore(game.getPlayer1());
-        int player2Score = game.getBoard().calculateScore(game.getPlayer2());
 
-        if (player1Score > player2Score) {
-            std::cout << game.getPlayer1().getName() << " wins this game!\n";
-            ++player1Wins;
-        }
-        else if (player2Score > player1Score) {
-            std::cout << game.getPlayer2().getName() << " wins this game!\n";
-            ++player2Wins;
+    int cardIndex;
+    std::cin >> cardIndex;
+    while (cardIndex < 0 || cardIndex >= game.getPlayer1().hand.size()) {
+        std::cout << "Invalid card index!\n";
+        std::cin >> cardIndex;
+    }
+    cardIndex -= 1; // Ajustare pentru vectorul intern
+
+    Card card = game.getPlayer1().hand[cardIndex];
+
+    try {
+        if (game.getBoard().placeCard(1, 1, card, game.getPlayer1())) {
+            game.getPlayer1().removeCard(cardIndex); // Elimină cartea din mână
+
+            // Verificare regulă iluzie
+            if (card.isIllusion && game.getBoard().checkIllusionRule(1, 1, game.getPlayer2())) {
+                std::cout << "Illusion revealed! Opponent's turn ends.\n";
+            }
         }
         else {
-            std::cout << "This game is a tie!\n";
+            std::cout << "Invalid move. Try again.\n";
+        }
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
+
+    //2 card
+    std::cout << "Player 2: Place second card.   Select card index from hand (1-" << game.getPlayer2().hand.size() << "): \n";
+    for (int i = 0; i < game.getPlayer2().hand.size(); i++)
+        if (!game.getPlayer2().hand[i].isIllusion)
+            std::cout << "[" << i + 1 << "]:" << game.getPlayer2().hand[i] << " ";
+    std::cout << "\n";
+
+    std::cin >> cardIndex;
+    while (cardIndex < 0 || cardIndex >= game.getPlayer2().hand.size()) {
+        std::cout << "Invalid card index!\n";
+        std::cin >> cardIndex;
+    }
+    cardIndex -= 1; // Ajustare pentru vectorul intern
+
+    card = game.getPlayer2().hand[cardIndex];
+
+    game.getBoard().printBoard();
+    std::cout << game.getPlayer2().name << "'s turn. Select row and column (e.g., 1 1): ";
+    int row, col;
+    std::cin >> row >> col;
+    while ((int)row != row || (int)col != col)
+    {
+        std::cout << "Insert correct coordinates!\n";
+        std::cin >> row >> col;
+    }
+
+    try {
+        if (game.getBoard().placeCard(row, col, card, game.getPlayer2())) {
+            game.getPlayer2().removeCard(cardIndex); // Elimină cartea din mână
+
+            // Verificare regulă iluzie
+            if (card.isIllusion && game.getBoard().checkIllusionRule(row, col, game.getPlayer1())) {
+                std::cout << "Illusion revealed! Opponent's turn ends.\n";
+            }
+        }
+        else {
+            std::cout << "Invalid move. Try again.\n";
+        }
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
+
+    while (player1Wins < 2 && player2Wins < 2) {
+        //system("CLS");
+        //game.resetGame(); // Resetează jocul pentru un nou meci
+        game.start();     // Începe runda
+
+        std::string winConditionP1 = game.getBoard().checkWinCondition(game.getPlayer1());
+        if (winConditionP1 != "")
+        {
+            player1Wins++;
+
+            std::cout << game.getPlayer1().getName() << " WINS!\n";
         }
 
-        std::cout << "Current Score: " << game.getPlayer1().getName() << " " << player1Wins
-            << " - " << player2Wins << " " << game.getPlayer2().getName() << "\n\n";
-    }
+        std::string winConditionP2 = game.getBoard().checkWinCondition(game.getPlayer2());
+        if (winConditionP2 != "")
+        {
+            player2Wins++;
 
-    if (player1Wins == 2) {
-        std::cout << game.getPlayer1().getName() << " wins the training mode!\n";
-    }
-    else {
-        std::cout << game.getPlayer2().getName() << " wins the training mode!\n";
+            std::cout << game.getPlayer2().getName() << " WINS!\n";
+        }
+
+        if (player1Wins == 2) {
+            std::cout << game.getPlayer1().getName() << " wins the training mode!\n";
+            return;
+        }
+        else if (player2Wins == 2) {
+            std::cout << game.getPlayer2().getName() << " wins the training mode!\n";
+            return;
+        }
     }
 }
 
