@@ -78,6 +78,56 @@ int main() {
     return 0;
 }
 
+void clearConsole() {
+    system("CLS");
+    /*
+    // Adaugare debug
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hConsole == INVALID_HANDLE_VALUE) {
+        std::cerr << "Error: Invalid handle\n";
+        return;
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+    if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+        std::cerr << "Error: Unable to get console screen buffer info\n";
+        return;
+    }
+
+    DWORD consoleSize;
+    DWORD charsWritten;
+
+    if (!FillConsoleOutputCharacter(hConsole, ' ', consoleSize, { 0, 0 }, &charsWritten)) {
+        std::cerr << "Error: Unable to fill console output character\n";
+        return;
+    }
+
+    if (!FillConsoleOutputAttribute(hConsole, csbi.wAttributes, consoleSize, { 0, 0 }, &charsWritten)) {
+        std::cerr << "Error: Unable to fill console output attribute\n";
+        return;
+    }
+
+    if (!SetConsoleCursorPosition(hConsole, { 0, 0 })) {
+        std::cerr << "Error: Unable to set console cursor position\n";
+        return;
+    }
+
+    // Obține dimensiunea bufferului consolei
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    consoleSize = csbi.dwSize.X * csbi.dwSize.Y;
+
+    // Umple bufferul cu spații
+    FillConsoleOutputCharacter(hConsole, ' ', consoleSize, { 0, 0 }, &charsWritten);
+
+    // Resetează atributele consolei
+    FillConsoleOutputAttribute(hConsole, csbi.wAttributes, consoleSize, { 0, 0 }, &charsWritten);
+
+    // Mutați cursorul la început
+    SetConsoleCursorPosition(hConsole, { 0, 0 });*/
+}
+
 void trainingMode() {
     std::cout << "Starting Training Mode...\n";
 
