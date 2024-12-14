@@ -38,7 +38,36 @@ void Game::start() {
                 std::cin >> choice;
             }
 
-            
+            if (choice == "yes") {
+                if (activePlayer.wizard.usedThisMatch) {
+                    std::cout << "The magical power has already been used this match!\n";
+                }
+                else {
+                    try {
+                        if (activePlayer.wizard.power == MagicPower::REMOVE_ROW_WITH_OWN_CARD) {
+                            int row;
+                            while (true) {
+                                std::cout << "Enter the row to remove: ";
+                                std::cin >> row;
+                                if (std::cin.fail() || row < 0 || row >= board.getSize()) {
+                                    std::cout << "Invalid row. Try again.\n";
+                                    std::cin.clear();
+                                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            try {
+                                activePlayer.wizard.useAbility(board, activePlayer, opponent, row, -1);
+                            }
+                            catch (const std::exception& e) {
+                                std::cout << e.what() << "\n";
+                            }
+                            currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă jucătorul
+                        }
+                        
+    }
 
 }
 
