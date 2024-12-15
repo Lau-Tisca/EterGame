@@ -9,7 +9,6 @@ Game::Game(int boardSize, const std::string& player1Name, const std::string& pla
     player1(player1Name, wizard1), // Asociază vrăjitorul 1 jucătorului 1
     player2(player2Name, wizard2), // Asociază vrăjitorul 2 jucătorului 2
     currentPlayer(1) {
-    initializePlayers();
 }
 
 void Game::resetGame() {
@@ -314,26 +313,7 @@ void Game::validateCardIndex(int& index, const Player& player) {
     }
 }
 
-void Game::initializePlayers() {
-    for (int i = 0; i < 2; ++i) {
-        player1.addCard(Card(1));
-    }
 
-    for (int i = 0; i < 2; ++i) {
-        player2.addCard(Card(1));
-    }
-
-    for (int i = 0; i < 2; ++i) {
-        player1.addCard(Card(2));
-    }
-
-    for (int i = 0; i < 2; ++i) {
-        player2.addCard(Card(2));
-    }
-
-    player1.addCard(Card(3, true));  // Iluzie
-    player2.addCard(Card(3, true));  // Iluzie
-}
 
 bool Game::placeIllusion(Player& activePlayer, GameBoard& board) {
     if (activePlayer.hasPlacedIllusion) {

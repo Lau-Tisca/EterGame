@@ -13,7 +13,6 @@ private:
 
     void validateInput(int& row, int& col);
     void validateCardIndex(int& index, const Player& player);
-    void initializePlayers();
 public:
     Game(int boardSize,
         const std::string& player1Name,
