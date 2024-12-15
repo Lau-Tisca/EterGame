@@ -77,6 +77,24 @@ std::string GameBoard::checkWinCondition(const Player& player) const {
 	return "";
 }
 
+void GameBoard::applyExplosion(const std::vector<std::pair<int, int>>& positions, int holeCount)
+{
+	std::cout << "Explosion triggered!\n";
+	for (const auto& pos : positions) {
+		int row = pos.first, col = pos.second;
+		if (board[row][col].has_value()) {
+			std::cout << "Card at (" << row << ", " << col << ") removed.\n";
+			board[row][col].reset();
+		}
+		// Transformăm unele poziții în gropi
+		if (holeCount > 0) {
+			addHole(row, col);
+			std::cout << "Hole created at (" << row << ", " << col << ").\n";
+			--holeCount;
+		}
+	}
+}
+
 void GameBoard::printBoard() const {
     std::cout << "\nCurrent Board State:\n";
 

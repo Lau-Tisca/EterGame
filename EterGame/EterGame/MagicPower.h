@@ -8,5 +8,31 @@ enum class MagicPower {
     MOVE_STACK_WITH_OWN_CARD,
     GAIN_EXTRA_CARD,
     MOVE_STACK_WITH_OPPONENT_CARD,
-    MOVE_ROW_TO_EDGE
+    MOVE_ROW_TO_EDGE,
+
+    // Puterile elementelor
+    CONTROLLED_EXPLOSION,
+    DESTRUCTION,
+    FLAMES,
+    LAVA,
+    FROM_ASHES,
+    SPARKS,
+    BLIZZARD,
+    WHIRLWIND,
+    HURRICANE,
+    BLAST,
+    MIRAGE,
+    STORM,
+    TIDE,
+    FOG,
+    WAVE,
+    WHIRLPOOL,
+    TSUNAMI,
+    CASCADE,
+    SUPPORT,
+    EARTHQUAKE,
+    SHATTER,
+    BORDERS,
+    AVALANCHE,
+    BOULDER
 };

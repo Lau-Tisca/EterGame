@@ -10,6 +10,7 @@ public:
     std::string name;
     std::vector<Card> hand;
     Wizard wizard;
+    mutable bool hasPlacedIllusion;
 
     Player(const std::string& name, const Wizard& wizard);
 
