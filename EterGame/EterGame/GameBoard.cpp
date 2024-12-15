@@ -78,21 +78,33 @@ std::string GameBoard::checkWinCondition(const Player& player) const {
 }
 
 void GameBoard::printBoard() const {
-	for (int i = 0; i < size; ++i) {
-		for (int j = 0; j < size; ++j) {
-			if (isHole(i, j)) {
-				std::cout << "H "; // „H” pentru groapă
-			}
-			else if (board[i][j].has_value()) {
-				std::cout << (board[i][j]->value.isIllusion ? "I" : std::to_string(board[i][j]->value)) << " ";
-			}
-			else {
-				std::cout << ". ";
-			}
-		}
-		std::cout << "\n";
-	}
+    std::cout << "\nCurrent Board State:\n";
+
+    std::cout << "  ";
+    for (int j = 0; j < size; ++j) {
+        std::cout << j << " ";
+    }
+    std::cout << "\n";
+
+    for (int i = 0; i < size; ++i) {
+        std::cout << i << " ";
+        for (int j = 0; j < size; ++j) {
+            if (isHole(i, j)) {
+                std::cout << "H ";
+            }
+            else if (board[i][j].has_value()) {
+                const Card& card = *board[i][j];
+                std::cout << card.value << " ";
+            }
+            else {
+                std::cout << ". ";
+            }
+        }
+        std::cout << "\n";
+    }
 }
+
+
 
 bool GameBoard::triggerExplosion(Player& currentPlayer) {
 	if (explosionOccurred) {
@@ -156,24 +168,50 @@ bool GameBoard::triggerExplosion(Player& currentPlayer) {
  */
 
 void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
-	if (!isValidPosition(row, col)) {
+	/*if (!isValidPosition(row, col)) {
 		throw std::runtime_error("Invalid position on the board!");
+	}*/
+	// Verifică dacă coordonatele sunt valide
+	if (row < 0 || row >= board.size() || col < 0 || col >= board[row].size()) {
+		throw std::out_of_range("Invalid coordinates: row or column out of bounds.");
 	}
 
+	// Verifică dacă există o carte la coordonate
 	if (!board[row][col].has_value()) {
 		throw std::runtime_error("No card at the given position to cover!");
 	}
 
-	// Verifică dacă este o carte a oponentului
 	const Card& topCard = *board[row][col];
-	if (topCard.owner == currentPlayer.name) {
-		throw std::runtime_error("You cannot cover your own card!");
+
+	// Verificare: nu poți acoperi propria iluzie
+	if (topCard.owner == currentPlayer.name && topCard.isIllusion) {
+		throw std::runtime_error("You cannot cover your own Illusion!");
 	}
 
+	if (topCard.isIllusion) {
+		// Iluzia este întoarsă cu fața în sus
+		std::cout << "The Illusion at (" << row << ", " << col << ") is revealed!\n";
+
+		// Dacă valoarea cărții oponentului este <= 1, elimină cartea oponentului
+		auto it = std::find_if(currentPlayer.hand.begin(), currentPlayer.hand.end(),
+			[&](const Card& card) { return card.value <= 1; });
+
+		if (it != currentPlayer.hand.end()) {
+			std::cout << "Your card is eliminated because its value is <= 1!\n";
+			//currentPlayer.removeCard(std::distance(currentPlayer.hand.begin(), it));
+
+
+			currentPlayer.removeCard(static_cast<int>(std::distance(currentPlayer.hand.begin(), it)));
+
+			return; // Tura se încheie
+		}
+	}
+
+	// Restul regulilor pentru acoperirea unei cărți normale
 	// Găsește o carte proprie de valoare strict mai mică
 	auto it = std::find_if(currentPlayer.hand.begin(), currentPlayer.hand.end(),
 		[&](const Card& card) {
-			return card.getValue() < topCard.getValue() && !card.isIllusion;
+			return card.value < topCard.value && !card.isIllusion;
 		});
 
 	if (it == currentPlayer.hand.end()) {
@@ -181,10 +219,11 @@ void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
 	}
 
 	// Plasează cartea proprie peste cea a oponentului
-	board[row][col] = Card(it->getValue(), it->isIllusion, it->isEther, currentPlayer.name);
+	board[row][col] = Card(it->value, it->isIllusion, it->isEther, currentPlayer.name);
 
 	// Elimină cartea din mână
-	currentPlayer.removeCard(std::distance(currentPlayer.hand.begin(), it));
+	//currentPlayer.removeCard(std::distance(currentPlayer.hand.begin(), it));
+	currentPlayer.removeCard(static_cast<int>(std::distance(currentPlayer.hand.begin(), it)));
 
 	std::cout << "Covered opponent's card at (" << row << ", " << col
 		<< ") with your card of value " << board[row][col]->value << ".\n";
