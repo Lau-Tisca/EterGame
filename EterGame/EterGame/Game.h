@@ -24,4 +24,9 @@ public:
     void start();
     bool placeIllusion(Player& activePlayer, GameBoard& board);
     bool placeNormalCard(Player& activePlayer, GameBoard& board, Player& opponent);
+
+    //getteri 
+    GameBoard& getBoard();
+    Player& getPlayer1();
+    Player& getPlayer2();
 };

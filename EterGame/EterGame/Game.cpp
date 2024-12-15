@@ -378,5 +378,16 @@ bool Game::placeNormalCard(Player& activePlayer, GameBoard& board, Player& oppon
 
     return false; // Plasarea a eșuat
 }
+GameBoard& Game::getBoard() {
+    return board;
+}
+
+Player& Game::getPlayer1() {
+    return player1;
+}
+
+Player& Game::getPlayer2() {
+    return player2;
+}
 
 
