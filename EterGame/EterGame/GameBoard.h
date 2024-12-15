@@ -59,7 +59,8 @@ public:
     void destruction(Player& opponent);
     void flames(Player& opponent, Player& currentPlayer);
     void lava(int number);
-
+    void fromAshes(Player& currentPlayer, Card card);
+    bool isCardCoveredByOpponent(int row, int col, const Player& player) const;
 
     int calculateScore(const Player& player) const;
     bool checkIllusionRule(int row, int col, Player& opponent);

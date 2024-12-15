@@ -579,6 +579,21 @@ void GameBoard::lava(int number) {
 	std::cout << "Lava activated: Cards with number " << number << " returned to owners' hands.\n";
 }
 
+void GameBoard::fromAshes(Player& currentPlayer, Card card) {
+	currentPlayer.addCard(card);
+	std::cout << "From Ashes activated: Card restored to " << currentPlayer.name << "'s hand.\n";
+}
+
+bool GameBoard::isCardCoveredByOpponent(int row, int col, const Player& player) const {
+	if (!isValidPosition(row, col) || !board[row][col].has_value()) {
+		return false;
+	}
+
+	// Verifică dacă proprietarul cărții de deasupra este adversarul
+	return board[row][col]->owner != player.name;
+}
+
+
 int GameBoard::calculateScore(const Player& player) const
 {
 	int score = 0;
