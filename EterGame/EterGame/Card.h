@@ -12,5 +12,6 @@ public:
     Card(int value, bool isIllusion = false, bool isEther = false, const std::string& owner = "");
 
     // Supraincarcare <<
-    int getValue() const;
+    friend std::ostream& operator<<(std::ostream& os, const Card& card);
+    friend bool operator==(Card a, Card b);
 };

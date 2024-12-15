@@ -9,3 +9,9 @@ std::ostream& operator<<(std::ostream& os, const Card& card) {
     os << (card.isIllusion ? "I" : (card.isEther ? "E" : std::to_string(card.value)));
     return os;
 }
+bool operator==(Card a, Card b)
+{
+    if (a.value == b.value)
+        return true;
+    return false;
+}
