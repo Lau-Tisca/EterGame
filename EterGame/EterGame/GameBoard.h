@@ -25,6 +25,7 @@ private:
     std::vector<std::pair<int, int>> holes; // Pozițiile "gropilor"
     //bool explosionOccurred;
     bool explosionOccurred = false;
+	bool isFirstMove = true;
 
     //Metode
     bool isValidPosition(int row, int col) const;

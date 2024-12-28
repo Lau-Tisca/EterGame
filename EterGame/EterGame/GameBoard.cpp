@@ -4,7 +4,7 @@
 GameBoard::GameBoard(int size, Player& p1, Player& p2)
 	: size(size),
 	explosionOccurred(false),
-	//isFirstMove(true),
+	isFirstMove(true),
 	board(size, std::vector<std::vector<std::optional<Card>>>(size, std::vector<std::optional<Card>>())),
 	player1(&p1),
 	player2(&p2) {
@@ -15,15 +15,23 @@ GameBoard::GameBoard(int size, Player& p1, Player& p2)
 GameBoard::GameBoard(int size)
 	: size(size),
 	explosionOccurred(false),
-	//isFirstMove(true),
+	isFirstMove(true),
 	board(size, std::vector<std::vector<std::optional<Card>>>(size, std::vector<std::optional<Card>>())),
 	player1(nullptr),
 	player2(nullptr) {
 	std::cout << "Initialized board with size: " << size << "x" << size << "\n";
 }
 
+// Getteri
 int GameBoard::getSize() const {
 	return size;
+}
+
+// Setteri
+void GameBoard::setFirstMove(bool value)
+{
+	isFirstMove = value;
+	std::cout << "First move reset to: " << (isFirstMove ? "true" : "false") << "\n";
 }
 
 // pentru explozie
