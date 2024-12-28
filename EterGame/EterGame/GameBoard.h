@@ -17,7 +17,11 @@
 class GameBoard {
 private:
     int size;
-    std::vector<std::vector<std::optional<Card>>> board;
+    /// board vechi
+    /// std::vector<std::vector<std::optional<Card>>> board;
+
+    /// board nou
+    std::vector<std::vector<std::vector<std::optional<Card>>>> board;
     std::vector<std::pair<int, int>> holes; // Pozițiile "gropilor"
     //bool explosionOccurred;
     bool explosionOccurred = false;
@@ -28,6 +32,9 @@ private:
     bool isLineFull(int startRow, int startCol, int dRow, int dCol) const;
 
 public:
+    // Constructor principal
+    GameBoard(int size, Player& p1, Player& p2);
+    // Secundar
     GameBoard(int size);
 
     //getter
