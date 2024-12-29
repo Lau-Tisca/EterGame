@@ -11,11 +11,13 @@ Game::Game(int boardSize, const std::string& player1Name, const std::string& pla
     currentPlayer(1) {
 }
 
+
 void Game::resetGame() {
-    board = GameBoard(board.getSize()); // Resetează tabla
-    player1.wizard.resetGame();
-    player2.wizard.resetGame();
-    currentPlayer = 1; // Opțional, setăm primul jucător
+    board = GameBoard(board.getSize(), player1, player2); // Resetează tabla
+    board.setFirstMove(true); // Resetează flag-ul de prima mutare
+    player1.resetWizardForGame();
+    player2.resetWizardForGame();
+    currentPlayer = 1; // Resetează la primul jucător
 }
 
 void Game::start() {
