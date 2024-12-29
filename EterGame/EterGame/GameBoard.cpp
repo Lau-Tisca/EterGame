@@ -62,22 +62,69 @@ bool GameBoard::isHole(int row, int col) const {
 	return std::find(holes.begin(), holes.end(), std::make_pair(row, col)) != holes.end();
 }
 
-bool GameBoard::placeCard(int row, int col, const Card card, const Player& currentPlayer) {
-	if (!isValidPosition(row, col) || isHole(row, col)) {
-		return false; // Nu permite plasarea pe o groapă sau pe o pozitie invalida
-	}
-	/* Nu mai e buna (eroare la '='
-	if (!board[row][col].has_value() || board[row][col]->value < card.value) {
-		card.owner = currentPlayer.name; // Asociaza cartea cu jucatorul curent
-		board[row][col] = card;
-		return true;
-	}*/
+bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const Player& constPlayer) {
+	std::cout << "Attempting to place card at (" << row << ", " << col << ", " << depth << ")...\n";
 
-	if (!board[row][col].has_value() || board[row][col]->value < card.getValue()) {
-		board[row][col] = Card(card.getValue(), card.isIllusion, card.isEther, currentPlayer.name); // Creează o copie cu proprietar setat
-		return true;
+	// Afișează starea grilei pentru debug
+	std::cout << "Grid size is: " << size << "x" << size << "\n";
+
+	// Verifică validitatea poziției și adâncimii
+	if (!isValidPosition(row, col, depth)) {
+		std::cerr << "Invalid position: (" << row << ", " << col << ", " << depth << ").\n";
+		return false;
 	}
-	return false;
+
+	// Verifică dacă poziția este marcată ca o groapă
+	if (isHole(row, col)) {
+		std::cerr << "Cannot place card on a hole at (" << row << ", " << col << ").\n";
+		return false;
+	}
+
+	// Verifică regula adiacentă + Bypass regula adiacentului la prima mutare
+	if (isFirstMove) {
+		std::cout << "First move: skipping adjacency check.\n";
+		isFirstMove = false; // Marchează că prima mutare s-a efectuat
+	}
+	else {
+		// Verifică regula adiacentă
+		if (!hasAdjacentCard(row, col) && !board.empty()) {
+			std::cerr << "Cards must be placed adjacent to existing cards.\n";
+			return false;
+		}
+	}
+
+	// Verifică dacă există deja o carte la poziția specificată
+	if (!board[row][col].empty() && board[row][col].size() > 0) {
+		const Card& topCard = board[row][col].back().value();
+		if (card.value <= topCard.value) {
+			std::cerr << "Cannot place a card with value less than or equal to the top card at this position.\n";
+			return false;
+		}
+		// Verifică dacă cartea de deasupra este o iluzie
+		if (topCard.isIllusion) {
+			std::cerr << "Cannot place a card on top of an illusion!\n";
+			return false;
+		}
+	}
+
+	// Verifică dacă se respectă regula valorii mai mari pentru cartea dedesubt
+	if (depth > 0 && board[row][col][depth - 1].has_value()) {
+		const Card& belowCard = board[row][col][depth - 1].value();
+		if (card.value <= belowCard.value) {
+			std::cerr << "Cannot place a card with value less than or equal to the card below!\n";
+			return false;
+		}
+	}
+
+	// Extinde nivelurile dacă este necesar
+	if (depth >= board[row][col].size()) {
+		board[row][col].resize(depth + 1, std::nullopt);
+	}
+
+	// Plasează cartea
+	board[row][col][depth] = card;
+
+	std::cout << "Placed card with value " << card.value << " at (" << row << ", " << col << ", " << depth << ").\n";
 }
 
 std::string GameBoard::checkWinCondition(const Player& player) const {
