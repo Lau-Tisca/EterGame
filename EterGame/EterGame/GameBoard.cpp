@@ -712,6 +712,18 @@ bool GameBoard::isCardCoveredByOpponent(int row, int col, const Player& player) 
 	return board[row][col]->owner != player.name;
 }
 
+Card GameBoard::removeTopCard(int row, int col){
+	// Verifică dacă există un teanc de cărți pe poziția dată
+	if (board[row][col].empty() || !board[row][col].back().has_value()) {
+		throw std::logic_error("No cards available at the given position.");
+	}
+
+	// Extrage cartea de deasupra teancului
+	Card topCard = board[row][col].back().value();
+	board[row][col].pop_back(); // Elimină cartea din teanc
+	return topCard;;
+}
+
 
 int GameBoard::calculateScore(const Player& player) const
 {
