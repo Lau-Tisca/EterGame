@@ -34,6 +34,14 @@ void GameBoard::setFirstMove(bool value)
 	std::cout << "First move reset to: " << (isFirstMove ? "true" : "false") << "\n";
 }
 
+
+bool GameBoard::isEmptyPosition(int row, int col, int depth) const {
+	return isValidPosition(row, col, depth) && !board[row][col][depth].has_value();
+
+	//return board[row][col].has_value();
+}
+
+
 // pentru explozie
 void GameBoard::addHole(int row, int col) {
 	holes.emplace_back(row, col);

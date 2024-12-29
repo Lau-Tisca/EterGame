@@ -27,8 +27,12 @@ private:
     bool explosionOccurred = false;
 	bool isFirstMove = true;
 
+    Player* player1;
+    Player* player2;
+
     //Metode
     bool isValidPosition(int row, int col, int depth) const;
+    bool isEmptyPosition(int row, int col, int depth) const;
     bool checkLine(const Player& player, int startRow, int startCol, int dRow, int dCol) const;
     bool isLineFull(int startRow, int startCol, int dRow, int dCol) const;
 
