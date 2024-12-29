@@ -119,30 +119,38 @@ void GameBoard::applyExplosion(const std::vector<std::pair<int, int>>& positions
 }
 
 void GameBoard::printBoard() const {
-    std::cout << "\nCurrent Board State:\n";
+	std::cout << "\nCurrent Board State:\n";
 
-    std::cout << "  ";
-    for (int j = 0; j < size; ++j) {
-        std::cout << j << " ";
-    }
-    std::cout << "\n";
+	// Afișează etichetele coloanelor
+	std::cout << "   ";
+	for (int col = 0; col < size; ++col) {
+		std::cout << col << "  ";
+	}
+	std::cout << "\n";
 
-    for (int i = 0; i < size; ++i) {
-        std::cout << i << " ";
-        for (int j = 0; j < size; ++j) {
-            if (isHole(i, j)) {
-                std::cout << "H ";
-            }
-            else if (board[i][j].has_value()) {
-                const Card& card = *board[i][j];
-                std::cout << card.value << " ";
-            }
-            else {
-                std::cout << ". ";
-            }
-        }
-        std::cout << "\n";
-    }
+	// Iterează prin fiecare rând
+	for (int row = 0; row < size; ++row) {
+		std::cout << row << " |"; // Eticheta rândului
+
+		for (int col = 0; col < size; ++col) {
+			if (isHole(row, col)) {
+				std::cout << " H ";
+			}
+			else if (!board[row][col].empty()) {
+				const auto& topCard = board[row][col].back();
+				if (topCard.has_value()) {
+					std::cout << " {" << topCard->value << "} ";
+				}
+				else {
+					std::cout << " . ";
+				}
+			}
+			else {
+				std::cout << " . ";
+			}
+		}
+		std::cout << "\n";
+	}
 }
 
 
