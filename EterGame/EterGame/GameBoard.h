@@ -68,7 +68,7 @@ public:
     void flames(Player& opponent, Player& currentPlayer);
     void lava(int number);
     void fromAshes(Player& currentPlayer, Card card);
-    bool isCardCoveredByOpponent(int row, int col, const Player& player) const;
+    bool isCardCoveredByOpponent(int row, int col, int depth, const Player& player) const;
     Card removeTopCard(int row, int col);
 
     int calculateScore(const Player& player) const;

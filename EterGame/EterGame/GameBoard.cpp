@@ -188,20 +188,29 @@ std::string GameBoard::checkWinCondition(const Player& player) const {
 	return "";
 }
 
-void GameBoard::applyExplosion(const std::vector<std::pair<int, int>>& positions, int holeCount)
-{
+void GameBoard::applyExplosion(const std::vector<std::pair<int, int>>& positions, int holeCount) {
 	std::cout << "Explosion triggered!\n";
+
 	for (const auto& pos : positions) {
-		int row = pos.first, col = pos.second;
-		if (board[row][col].has_value()) {
-			std::cout << "Card at (" << row << ", " << col << ") removed.\n";
-			board[row][col].reset();
+		int row = pos.first;
+		int col = pos.second;
+
+		// Verifică dacă poziția este validă
+		if (row < 0 || row >= size || col < 0 || col >= size) {
+			continue; // Sari peste poziții invalide
 		}
-		// Transformăm unele poziții în gropi
+
+		// Elimină toate cărțile de pe poziția respectivă
+		if (!board[row][col].empty()) {
+			std::cout << "Clearing all cards at position (" << row << ", " << col << ").\n";
+			board[row][col].clear(); // Șterge toate nivelurile
+		}
+
+		// Transformă pozițiile în gropi, dacă este cazul
 		if (holeCount > 0) {
 			addHole(row, col);
-			std::cout << "Hole created at (" << row << ", " << col << ").\n";
-			--holeCount;
+			std::cout << "Created a hole at (" << row << ", " << col << ").\n";
+			--holeCount; // Scade numărul de gropi rămase
 		}
 	}
 }
@@ -703,13 +712,13 @@ void GameBoard::fromAshes(Player& currentPlayer, Card card) {
 	std::cout << "From Ashes activated: Card restored to " << currentPlayer.name << "'s hand.\n";
 }
 
-bool GameBoard::isCardCoveredByOpponent(int row, int col, const Player& player) const {
-	if (!isValidPosition(row, col) || !board[row][col].has_value()) {
+bool GameBoard::isCardCoveredByOpponent(int row, int col, int depth, const Player& player) const {
+	if (!isValidPosition(row, col, depth) || !board[row][col][depth].has_value()) {
 		return false;
 	}
 
 	// Verifică dacă proprietarul cărții de deasupra este adversarul
-	return board[row][col]->owner != player.name;
+	return board[row][col][depth]->owner != player.name;
 }
 
 Card GameBoard::removeTopCard(int row, int col){
@@ -721,7 +730,7 @@ Card GameBoard::removeTopCard(int row, int col){
 	// Extrage cartea de deasupra teancului
 	Card topCard = board[row][col].back().value();
 	board[row][col].pop_back(); // Elimină cartea din teanc
-	return topCard;;
+	return topCard;
 }
 
 
