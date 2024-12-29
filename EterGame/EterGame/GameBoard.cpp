@@ -527,8 +527,20 @@ void GameBoard::controlledExplosion(Player& currentPlayer)
 	std::cout << "Controlled explosion activated!\n";
 }
 
-bool GameBoard::isValidPosition(int row, int col) const {
-	return row >= 0 && row < size && col >= 0 && col < size;
+bool GameBoard::isValidPosition(int row, int col, int depth) const {
+	std::cout << "Validating position: (" << row << ", " << col << ", " << depth << ") for grid size: " << size << "\n";
+
+	if (row < 0 || row >= size || col < 0 || col >= size) {
+		std::cout << "Invalid row or column!\n";
+		return false;
+	}
+
+	if (depth < 0) {
+		std::cout << "Invalid depth!\n";
+		return false;
+	}
+
+	return true;
 }
 
 bool GameBoard::checkLine(const Player& player, int startRow, int startCol, int dRow, int dCol) const {

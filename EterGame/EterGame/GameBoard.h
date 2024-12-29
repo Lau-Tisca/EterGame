@@ -28,7 +28,7 @@ private:
 	bool isFirstMove = true;
 
     //Metode
-    bool isValidPosition(int row, int col) const;
+    bool isValidPosition(int row, int col, int depth) const;
     bool checkLine(const Player& player, int startRow, int startCol, int dRow, int dCol) const;
     bool isLineFull(int startRow, int startCol, int dRow, int dCol) const;
 
