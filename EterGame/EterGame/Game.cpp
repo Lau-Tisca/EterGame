@@ -344,11 +344,12 @@ bool Game::placeIllusion(Player& activePlayer, GameBoard& board) {
 }
 
 bool Game::placeNormalCard(Player& activePlayer, GameBoard& board, Player& opponent) {
-    std::cout << activePlayer.name << "'s turn. Select row and column (e.g., 1 1): ";
-    int row, col;
-    std::cin >> row >> col;
+    std::cout << "Select card index from hand (1-" << activePlayer.hand.size() << "): \n";
+    for (int i = 0; i < activePlayer.hand.size(); i++)
+        if (!activePlayer.hand[i].isIllusion)
+            std::cout << "[" << i + 1 << "]:" << activePlayer.hand[i] << " ";
+    std::cout << "\n";
 
-    std::cout << "Select card index from hand (1-" << activePlayer.hand.size() << "): ";
     int cardIndex;
     std::cin >> cardIndex;
     cardIndex -= 1; // Ajustare pentru vectorul intern
@@ -359,27 +360,24 @@ bool Game::placeNormalCard(Player& activePlayer, GameBoard& board, Player& oppon
     }
 
     Card card = activePlayer.hand[cardIndex];
+    std::cout << "Selected card value: " << card.value << "\n";
 
-    try {
-        if (board.placeCard(row, col, card, activePlayer)) {
-            activePlayer.removeCard(cardIndex); // Elimină cartea din mână
+    int row, col;
+    std::cout << activePlayer.name << "'s turn. Select row and column (e.g., 1 1): ";
+    std::cin >> row >> col;
 
-            // Verificare regulă iluzie
-            if (card.isIllusion && board.checkIllusionRule(row, col, opponent)) {
-                std::cout << "Illusion revealed! Opponent's turn ends.\n";
-            }
-            return true; // Plasarea a fost reușită
-        }
-        else {
-            std::cout << "Invalid move. Try again.\n";
-        }
+    std::cout << "Attempting to place card...\n";
+    if (board.placeCard(row, col, 0, card, activePlayer)) {
+        std::cout << "Card placed successfully.\n";
+        activePlayer.removeCard(cardIndex); // Elimină cartea din mână
+        return true;
     }
-    catch (const std::exception& e) {
-        std::cout << e.what() << "\n";
+    else {
+        std::cout << "Failed to place card.\n";
+        return false;
     }
-
-    return false; // Plasarea a eșuat
 }
+
 GameBoard& Game::getBoard() {
     return board;
 }
