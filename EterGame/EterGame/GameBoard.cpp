@@ -81,22 +81,63 @@ bool GameBoard::placeCard(int row, int col, const Card card, const Player& curre
 }
 
 std::string GameBoard::checkWinCondition(const Player& player) const {
-	for (int i = 0; i < size; ++i) {
-		if (checkLine(player, i, 0, 0, 1)) {
-			return "horizontal line";
+	// Verificare linii orizontale
+	for (int row = 0; row < size; ++row) {
+		for (int col = 0; col < size; ++col) {
+			bool horizontalWin = true;
+			for (int d = 0; d < size; ++d) {
+				if (board[row][d].empty() || !board[row][d][0].has_value() || board[row][d][0]->owner != player.name) {
+					horizontalWin = false;
+					break;
+				}
+			}
+			if (horizontalWin) {
+				return "Horizontal line at row " + std::to_string(row);
+			}
 		}
+	}
 
-		if (checkLine(player, 0, i, 1, 0)) {
-			return "vertical line";
+	// Verificare coloane verticale
+	for (int col = 0; col < size; ++col) {
+		for (int row = 0; row < size; ++row) {
+			bool verticalWin = true;
+			for (int d = 0; d < size; ++d) {
+				if (board[d][col].empty() || !board[d][col][0].has_value() || board[d][col][0]->owner != player.name) {
+					verticalWin = false;
+					break;
+				}
+			}
+			if (verticalWin) {
+				return "Vertical line at column " + std::to_string(col);
+			}
 		}
+	}
 
+	// Verificare diagonală principală (\)
+	bool diagonalWin1 = true;
+	for (int d = 0; d < size; ++d) {
+		if (board[d][d].empty() || !board[d][d][0].has_value() || board[d][d][0]->owner != player.name) {
+			diagonalWin1 = false;
+			break;
+		}
 	}
-	if (checkLine(player, 0, 0, 1, 1)) {
-		return "diagonal (\\)";
+	if (diagonalWin1) {
+		return "Main diagonal (\\)";
 	}
-	if (checkLine(player, 0, size - 1, 1, -1)) {
-		return "diagonal (/)";
+
+	// Verificare diagonală secundară (/)
+	bool diagonalWin2 = true;
+	for (int d = 0; d < size; ++d) {
+		if (board[d][size - 1 - d].empty() || !board[d][size - 1 - d][0].has_value() || board[d][size - 1 - d][0]->owner != player.name) {
+			diagonalWin2 = false;
+			break;
+		}
 	}
+	if (diagonalWin2) {
+		return "Secondary diagonal (/)";
+	}
+
+	// Dacă nu există o condiție de câștig
 	return "";
 }
 
