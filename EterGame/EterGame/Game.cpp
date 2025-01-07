@@ -11,6 +11,54 @@ Game::Game(int boardSize, const std::string& player1Name, const std::string& pla
     currentPlayer(1) {
 }
 
+void Game::resetPlayerHand(Player& player) {
+    // Golește mâna actuală
+    player.hand.clear();
+
+    // Adaugă cărțile inițiale (în funcție de mod sau reguli)
+    switch (currentMode) {
+    case GameMode::Training:
+        player.addCard(Card(1));
+        player.addCard(Card(1));
+        player.addCard(Card(2));
+        player.addCard(Card(2));
+        player.addCard(Card(3));
+        player.addCard(Card(3));
+        player.addCard(Card(4));
+        break;
+
+    case GameMode::WizardsDuel:
+        player.addCard(Card(1));
+        player.addCard(Card(1));
+        player.addCard(Card(2));
+        player.addCard(Card(2));
+        player.addCard(Card(2));
+        player.addCard(Card(3));
+        player.addCard(Card(3));
+        player.addCard(Card(3));
+        player.addCard(Card(4));
+        player.addCard(Card(0, false, true)); // Ether card
+        break;
+
+    case GameMode::ElementsDuel:
+        player.addCard(Card(1));
+        player.addCard(Card(2));
+        player.addCard(Card(2));
+        player.addCard(Card(2));
+        player.addCard(Card(3));
+        player.addCard(Card(3));
+        player.addCard(Card(3));
+        player.addCard(Card(4));
+        player.addCard(Card(0, false, true)); // Eter
+        break;
+    }
+
+    std::cout << player.getName() << "'s hand has been reset for mode: "
+        << (currentMode == GameMode::Training ? "Training" :
+            currentMode == GameMode::WizardsDuel ? "Wizards Duel" : "Elements Duel") << ".\n";
+
+    //std::cout << player.getName() << "'s hand has been reset.\n";
+}
 
 void Game::resetGame() {
     board = GameBoard(board.getSize(), player1, player2); // Resetează tabla
