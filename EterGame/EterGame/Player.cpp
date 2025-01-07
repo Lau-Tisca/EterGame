@@ -1,9 +1,9 @@
 ﻿#include "Player.h"
-#include <iostream>
-#include <stdexcept>
+#include "Wizard.h"
 
 Player::Player(const std::string& name, const Wizard& wizard)
-    : name(name), wizard(wizard) {}
+    : name(name), wizard(wizard), hasPlacedIllusion(false) {
+}
 
 void Player::addCard(const Card& card) {
     hand.push_back(card);
@@ -18,15 +18,21 @@ void Player::removeCard(int index) {
     }
 }
 
-void Player::useWizardAbility(GameBoard& board, int row, int col) {
-    try {
-        wizard.useAbility(board, row, col, *this);
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Error using wizard ability: " << e.what() << "\n";
-    }
+// Abilitatea vrajitorului
+void Player::useWizardAbility(GameBoard& board, Player& opponent, int row, int col, int destRow, int destCol) {
+    wizard.useAbility(board, *this, opponent, row, col, destRow, destCol);
 }
 
 void Player::resetWizardForGame() {
     wizard.resetGame();
+}
+
+const std::string& Player::getName() const {
+    return name;
+}
+
+const Wizard& Player::getWizard() const
+{
+    // TODO: insert return statement here
+    return wizard;
 }
