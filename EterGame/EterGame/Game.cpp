@@ -15,9 +15,39 @@ Game::Game(int boardSize, const std::string& player1Name, const std::string& pla
 void Game::resetGame() {
     board = GameBoard(board.getSize(), player1, player2); // Resetează tabla
     board.setFirstMove(true); // Resetează flag-ul de prima mutare
+
+    // Reseteaza vrajitorii pentru un nou joc
     player1.resetWizardForGame();
     player2.resetWizardForGame();
-    currentPlayer = 1; // Resetează la primul jucător
+
+    // Resetează mâinile jucătorilor conform modului curent
+    switch (currentMode) {
+    case GameMode::Training:
+        resetPlayerHand(player1);
+        resetPlayerHand(player2);
+        break;
+
+    case GameMode::WizardsDuel:
+        resetPlayerHand(player1);
+        resetPlayerHand(player2);
+        player1.setWizard(Wizard::getRandomWizard());
+        player2.setWizard(Wizard::getRandomWizardDistinctFrom(player1.getWizard()));
+        break;
+
+    case GameMode::ElementsDuel:
+        resetPlayerHand(player1);
+        resetPlayerHand(player2);
+        break;
+    }
+
+    // Setează jucătorul curent la primul jucător
+    currentPlayer = 1;
+
+    std::cout << "Game reset for mode: "
+        << (currentMode == GameMode::Training ? "Training" :
+            currentMode == GameMode::WizardsDuel ? "Wizards Duel" : "Elements Duel") << ".\n";
+
+    //std::cout << "Game reset. Ready for the next round!\n";
 }
 
 void Game::start() {

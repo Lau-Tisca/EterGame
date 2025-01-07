@@ -36,3 +36,9 @@ const Wizard& Player::getWizard() const
     // TODO: insert return statement here
     return wizard;
 }
+
+void Player::setWizard(const Wizard& wizard) {
+    this->wizard = wizard;
+    std::cout << name << " has been assigned the wizard: " << wizard.getName() << " with power "
+        << static_cast<int>(wizard.getPower()) << ".\n";
+}
