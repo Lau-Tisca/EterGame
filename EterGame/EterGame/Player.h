@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 #include "Card.h"
-#include "GameBoard.h"
-
 #include "Wizard.h"
+
 class Player {
 public:
     std::string name;
@@ -19,4 +19,11 @@ public:
 
     void useWizardAbility(GameBoard& board, int row, int col);
     void resetWizardForGame();
+
+    //Getter nume
+    const std::string& getName() const;
+    const Wizard& getWizard() const;
+
+    // setteri
+    void setWizard(const Wizard& wizard);
 };
