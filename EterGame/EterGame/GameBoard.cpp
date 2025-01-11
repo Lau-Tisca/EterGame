@@ -138,33 +138,43 @@ bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const P
 std::string GameBoard::checkWinCondition(const Player& player) const {
 	// Verificare linii orizontale
 	for (int row = 0; row < size; ++row) {
+		bool horizontalWin = true;
 		for (int col = 0; col < size; ++col) {
-			bool horizontalWin = true;
-			for (int d = 0; d < size; ++d) {
-				if (board[row][d].empty() || !board[row][d][0].has_value() || board[row][d][0]->owner != player.name) {
-					horizontalWin = false;
-					break;
-				}
+			if (board[row][col].empty() ||
+				!board[row][col][0].has_value() ||
+				board[row][col][0]->isIllusion || // Ignoră iluziile
+				board[row][col][0]->owner != player.name)
+			{
+				horizontalWin = false;
+				std::cout << "Debug: Position (" << row << ", " << col << ") breaks horizontal condition. "
+					<< "Owner: " << (board[row][col].empty() ? "empty" : board[row][col][0]->owner) << "\n";
+				break;
 			}
-			if (horizontalWin) {
-				return "Horizontal line at row " + std::to_string(row);
-			}
+		}
+		if (horizontalWin) {
+			std::cout << "Debug: Horizontal win detected on row " << row << "\n";
+			return "Horizontal line at row " + std::to_string(row);
 		}
 	}
 
 	// Verificare coloane verticale
 	for (int col = 0; col < size; ++col) {
+		bool verticalWin = true;
 		for (int row = 0; row < size; ++row) {
-			bool verticalWin = true;
-			for (int d = 0; d < size; ++d) {
-				if (board[d][col].empty() || !board[d][col][0].has_value() || board[d][col][0]->owner != player.name) {
-					verticalWin = false;
-					break;
-				}
+			if (board[row][col].empty() ||
+				!board[row][col][0].has_value() ||
+				board[row][col][0]->isIllusion || // Ignoră iluziile
+				board[row][col][0]->owner != player.name)
+			{
+				verticalWin = false;
+				std::cout << "Debug: Position (" << row << ", " << col << ") breaks vertical condition. "
+					<< "Owner: " << (board[row][col].empty() ? "empty" : board[row][col][0]->owner) << "\n";
+				break;
 			}
-			if (verticalWin) {
-				return "Vertical line at column " + std::to_string(col);
-			}
+		}
+		if (verticalWin) {
+			std::cout << "Debug: Vertical win detected on column " << col << "\n";
+			return "Vertical line at column " + std::to_string(col);
 		}
 	}
 
