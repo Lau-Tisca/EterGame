@@ -72,34 +72,55 @@ bool GameBoard::isHole(int row, int col) const {
 
 bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const Player& constPlayer) {
 	std::cout << "Attempting to place card at (" << row << ", " << col << ", " << depth << ")...\n";
+    
+    // Afișează starea grilei pentru debug
+    std::cout << "Grid size is: " << size << "x" << size << "\n";
 
-	// Afișează starea grilei pentru debug
-	std::cout << "Grid size is: " << size << "x" << size << "\n";
+    // Verifică validitatea poziției și adâncimii
+    if (!isValidPosition(row, col, depth)) {
+        std::cerr << "Invalid position: (" << row << ", " << col << ", " << depth << ").\n";
+        return false;
+    }
 
-	// Verifică validitatea poziției și adâncimii
-	if (!isValidPosition(row, col, depth)) {
-		std::cerr << "Invalid position: (" << row << ", " << col << ", " << depth << ").\n";
-		return false;
-	}
+    // Verifică dacă poziția este marcată ca o groapă
+    if (isHole(row, col)) {
+        std::cerr << "Cannot place card on a hole at (" << row << ", " << col << ").\n";
+        return false;
+    }
 
-	// Verifică dacă poziția este marcată ca o groapă
-	if (isHole(row, col)) {
-		std::cerr << "Cannot place card on a hole at (" << row << ", " << col << ").\n";
-		return false;
-	}
+    // Verifică regula adiacentă + Bypass regula adiacentului la prima mutare
+    if (isFirstMove) {
+        std::cout << "First move: skipping adjacency check.\n";
+        isFirstMove = false; // Marchează că prima mutare s-a efectuat
+    }
+    else {
+        // Verifică regula adiacentă
+        if (!hasAdjacentCard(row, col) && !board.empty()) {
+            std::cerr << "Cards must be placed adjacent to existing cards.\n";
+            return false;
+        }
+    }
 
-	// Verifică regula adiacentă + Bypass regula adiacentului la prima mutare
-	if (isFirstMove) {
-		std::cout << "First move: skipping adjacency check.\n";
-		isFirstMove = false; // Marchează că prima mutare s-a efectuat
-	}
-	else {
-		// Verifică regula adiacentă
-		if (!hasAdjacentCard(row, col) && !board.empty()) {
-			std::cerr << "Cards must be placed adjacent to existing cards.\n";
-			return false;
-		}
-	}
+    // Verifică dacă cartea este o iluzie
+    if (card.isIllusion) {
+        std::cout << "Placing an illusion at (" << row << ", " << col << ").\n";
+        if (!board[row][col].empty() && board[row][col].size() > 0) {
+            const Card& topCard = board[row][col].back().value();
+            if (topCard.isIllusion) {
+                std::cerr << "Cannot place another illusion at the same position!\n";
+                return false;
+            }
+        }
+        // Extinde nivelurile dacă este necesar
+        if (depth >= board[row][col].size()) {
+            board[row][col].resize(depth + 1, std::nullopt);
+        }
+        // Plasează cartea ca iluzie
+        Card placedCard = card;
+        placedCard.owner = constPlayer.name;
+        board[row][col][depth] = placedCard;
+        return true;
+    }
 
 	// Verifică dacă există deja o carte la poziția specificată
 	if (!board[row][col].empty() && board[row][col].size() > 0) {
