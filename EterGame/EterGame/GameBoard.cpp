@@ -178,31 +178,45 @@ std::string GameBoard::checkWinCondition(const Player& player) const {
 		}
 	}
 
+
 	// Verificare diagonală principală (\)
 	bool diagonalWin1 = true;
 	for (int d = 0; d < size; ++d) {
-		if (board[d][d].empty() || !board[d][d][0].has_value() || board[d][d][0]->owner != player.name) {
+		if (board[d][d].empty() ||
+			!board[d][d][0].has_value() ||
+			board[d][d][0]->isIllusion || // Ignoră iluziile
+			board[d][d][0]->owner != player.name)
+		{
 			diagonalWin1 = false;
+			std::cout << "Debug: Position (" << d << ", " << d << ") breaks main diagonal condition.\n";
 			break;
 		}
 	}
 	if (diagonalWin1) {
+		std::cout << "Debug: Main diagonal (\\) win detected\n";
 		return "Main diagonal (\\)";
 	}
 
 	// Verificare diagonală secundară (/)
 	bool diagonalWin2 = true;
 	for (int d = 0; d < size; ++d) {
-		if (board[d][size - 1 - d].empty() || !board[d][size - 1 - d][0].has_value() || board[d][size - 1 - d][0]->owner != player.name) {
+		if (board[d][size - 1 - d].empty() ||
+			!board[d][size - 1 - d][0].has_value() ||
+			board[d][size - 1 - d][0]->isIllusion || // Ignoră iluziile
+			board[d][size - 1 - d][0]->owner != player.name)
+		{
 			diagonalWin2 = false;
+			std::cout << "Debug: Position (" << d << ", " << size - 1 - d << ") breaks secondary diagonal condition.\n";
 			break;
 		}
 	}
 	if (diagonalWin2) {
+		std::cout << "Debug: Secondary diagonal (/) win detected\n";
 		return "Secondary diagonal (/)";
 	}
 
 	// Dacă nu există o condiție de câștig
+	std::cout << "Debug: No win condition detected for player " << player.name << "\n";
 	return "";
 }
 
