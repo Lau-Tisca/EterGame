@@ -12,6 +12,13 @@ Wizard::Wizard(const std::string& name, MagicPower power)
     : name(name), power(power), usedThisGame(false), usedThisMatch(false) {
 }*/
 
+Wizard::Wizard()
+    : name("Default Wizard"),
+    power(MagicPower::NONE),
+    usedThisGame(false),
+    usedThisMatch(false) {
+}
+
 Wizard::Wizard(const std::u8string& name, MagicPower power)
     : name(name), power(power) {
 }

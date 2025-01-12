@@ -1,6 +1,9 @@
 #pragma once
 
 enum class MagicPower {
+    NONE,
+
+    //Puterile vrajitorilor
     REMOVE_OPPONENT_CARD_OVER_OWN,
     REMOVE_ROW_WITH_OWN_CARD,
     COVER_OPPONENT_CARD,

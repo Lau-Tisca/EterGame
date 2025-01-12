@@ -281,7 +281,6 @@ void GameBoard::printBoard() const {
 	std::cout << "    ";
 	for (int col = 0; col < size; ++col) {
 		std::cout << col << "   |  \b";
-		/// "\b" este un caracter backspace pentru a șterge un spațiu în plus
 	}
 	std::cout << "\n";
 
