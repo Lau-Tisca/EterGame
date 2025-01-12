@@ -875,3 +875,17 @@ bool GameBoard::checkIllusionRule(int row, int col, Player& opponent) {
 
 	return true; // Oponentul nu poate continua tura
 }
+
+bool GameBoard::isSpaceEmpty(int row, int col) const {
+	if (row < 0 || row >= size || col < 0 || col >= size) {
+		return false; // Poziție invalidă
+	}
+
+	for (const auto& level : board[row][col]) {
+		if (level.has_value()) {
+			return false; // Există o carte la cel puțin un nivel
+		}
+	}
+
+	return true; // Toate nivelurile sunt goale
+}
