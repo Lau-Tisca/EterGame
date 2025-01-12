@@ -70,6 +70,20 @@ bool GameBoard::isHole(int row, int col) const {
 	return std::find(holes.begin(), holes.end(), std::make_pair(row, col)) != holes.end();
 }
 
+bool GameBoard::hasAdjacentCard(int row, int col) const {
+	std::cout << "Checking adjacency for position (" << row << ", " << col << ")...\n";
+	static const int directions[8][2] = { {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
+	for (const auto& dir : directions) {
+		int newRow = row + dir[0];
+		int newCol = col + dir[1];
+		if (isValidPosition(newRow, newCol, 0) && !board[newRow][newCol].empty()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const Player& constPlayer) {
 	std::cout << "Attempting to place card at (" << row << ", " << col << ", " << depth << ")...\n";
 
@@ -889,3 +903,5 @@ bool GameBoard::isSpaceEmpty(int row, int col) const {
 
 	return true; // Toate nivelurile sunt goale
 }
+
+

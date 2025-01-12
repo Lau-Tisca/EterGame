@@ -42,12 +42,16 @@ public:
     // Secundar
     GameBoard(int size);
 
+    bool isSpaceEmpty(int row, int col) const;
+
+    void setFirstMove(bool value);
+
     //getter
     int getSize() const;
 
     //Metode
     void addHole(int row, int col);
-
+    bool hasAdjacentCard(int row, int col) const;
     void createHole(int row, int col);
     bool isHole(int row, int col) const;
 
