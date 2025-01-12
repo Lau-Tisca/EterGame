@@ -401,13 +401,35 @@ bool Game::placeIllusion(Player& activePlayer, GameBoard& board) {
         return false; // Jucătorul nu poate plasa altă iluzie
     }
 
-    std::cout << "Enter the row and column to place the illusion: ";
+    std::cout << "Select card index from hand (1-" << activePlayer.hand.size() << "): \n";
+    for (int i = 0; i < activePlayer.hand.size(); i++)
+        if (!activePlayer.hand[i].isIllusion)
+            std::cout << "[" << i + 1 << "]:" << activePlayer.hand[i] << " ";
+    std::cout << "\n";
+
+    int cardIndex;
+    std::cin >> cardIndex;
+    cardIndex -= 1; // Ajustare pentru vectorul intern
+
+    if (cardIndex < 0 || cardIndex >= activePlayer.hand.size()) {
+        std::cout << "Invalid card index!\n";
+        return false;
+    }
+
+    // Obtine cartea selectata
+    Card card = activePlayer.hand[cardIndex];
+    card.isIllusion = true; // Marchează ca fiind iluzie
+
+    // Alegerea poziției
+    std::cout << activePlayer.name << "'s turn. Select row and column (e.g., 1 1): ";
     int row, col;
     std::cin >> row >> col;
 
     try {
-        if (board.placeCard(row, col, Card(1, true, false, activePlayer.name), activePlayer)) {
+        if (board.placeCard(row, col, 0, card, activePlayer)) {
+            activePlayer.removeCard(cardIndex); // Elimină cartea din mână
             activePlayer.hasPlacedIllusion = true; // Marchează utilizarea iluziilor
+            std::cout << "Illusion placed successfully at (" << row << ", " << col << ").\n";
             return true; // Plasarea a fost reușită
         }
         else {
