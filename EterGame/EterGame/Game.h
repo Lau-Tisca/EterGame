@@ -3,9 +3,12 @@
 #include "GameBoard.h"
 #include "Player.h"
 #include "Wizard.h"
+#include <vector>
+#include "GameMode.h"
 
 class Game {
 private:
+    GameMode currentMode;
     GameBoard board;
     Player player1;
     Player player2;
@@ -18,8 +21,10 @@ public:
         const std::string& player1Name,
         const std::string& player2Name,
         const Wizard& wizard1,
-        const Wizard& wizard2);
+        const Wizard& wizard2,
+        GameMode mode);
 
+    void resetPlayerHand(Player& player);
     void resetGame();
     void start();
     bool placeIllusion(Player& activePlayer, GameBoard& board);

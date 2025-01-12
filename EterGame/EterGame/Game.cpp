@@ -2,14 +2,26 @@
 #include "Game.h"
 #include "GameBoard.h"
 #include "Player.h"
+#include <limits>
+#include <stdexcept>
 
 Game::Game(int boardSize, const std::string& player1Name, const std::string& player2Name,
-    const Wizard& wizard1, const Wizard& wizard2)
-    : board(boardSize),
-    player1(player1Name, wizard1), // Asociază vrăjitorul 1 jucătorului 1
-    player2(player2Name, wizard2), // Asociază vrăjitorul 2 jucătorului 2
-    currentPlayer(1) {
+    const Wizard& wizard1, const Wizard& wizard2, GameMode mode)
+    : board(boardSize, player1, player2),
+    player1(player1Name, wizard1), // Jucătorul 1 primește un vrăjitor
+    player2(player2Name, wizard2), // Jucătorul 2 primește un vrăjitor
+    currentPlayer(1),
+    currentMode(mode)
+{
+    std::cout << "Game initialized with players: "
+        << player1Name << " and " << player2Name
+        << " in mode: "
+        << (mode == GameMode::Training ? "Training" :
+            mode == GameMode::WizardsDuel ? "Wizard's Duel" :
+            "Elements Duel")
+        << ".\n";
 }
+
 
 void Game::resetPlayerHand(Player& player) {
     // Golește mâna actuală
