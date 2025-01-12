@@ -277,36 +277,42 @@ void GameBoard::applyExplosion(const std::vector<std::pair<int, int>>& positions
 void GameBoard::printBoard() const {
 	std::cout << "\nCurrent Board State:\n";
 
-	// Afișează etichetele coloanelor
-	std::cout << "   ";
+	// Etichetele coloanelor
+	std::cout << "    ";
 	for (int col = 0; col < size; ++col) {
-		std::cout << col << "  ";
+		std::cout << col << "   |  \b";
+		/// "\b" este un caracter backspace pentru a șterge un spațiu în plus
 	}
 	std::cout << "\n";
 
-	// Iterează prin fiecare rând
+	// Linie separatoare
+	std::cout << "--" << std::string(size * 6, '-') << "|\n";
+
+	// Iteram prin rânduri si coloane
 	for (int row = 0; row < size; ++row) {
-		std::cout << row << " |"; // Eticheta rândului
+		std::cout << row << " | "; // Eticheta rândului
 
 		for (int col = 0; col < size; ++col) {
 			if (isHole(row, col)) {
-				std::cout << " H ";
+				std::cout << "H. | "; // Marcaj pentru gropi
 			}
-			else if (!board[row][col].empty()) {
-				const auto& topCard = board[row][col].back();
-				if (topCard.has_value()) {
-					std::cout << " {" << topCard->value << "} ";
-				}
-				else {
-					std::cout << " . ";
-				}
+			else if (!board[row][col].empty()
+				&& board[row][col].back().has_value())
+			{
+				const auto& card = board[row][col].back().value(); // Ultima carte din stivă
+				char ownerSymbol = (card.owner == player1->name) ? 'a' :
+					(card.owner == player2->name) ? 'b' : '.';
+				std::cout << card.value << ownerSymbol << "  | ";
 			}
 			else {
-				std::cout << " . ";
+				std::cout << "..  | "; // Poziție goală
 			}
 		}
 		std::cout << "\n";
 	}
+
+	// Linie separatoare între rânduri
+	std::cout << "--" << std::string(size * 6, '-') << "|\n";
 }
 
 
