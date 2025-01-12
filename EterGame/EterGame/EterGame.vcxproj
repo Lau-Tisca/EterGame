@@ -142,6 +142,7 @@
     <ClInclude Include="ExplosionPattern.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameBoard.h" />
+    <ClInclude Include="GameMode.h" />
     <ClInclude Include="MagicPower.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Wizard.h" />
