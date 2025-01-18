@@ -1,4 +1,4 @@
-#include "GameState.h"
+﻿#include "GameState.h"
 #include <iostream>
 #include <fstream>
 
@@ -22,4 +22,31 @@ GameState GameState::from_json(const json& j) {
     j.at("player1Score").get_to(state.player1Score);
     j.at("player2Score").get_to(state.player2Score);
     return state;
+}
+
+void saveGame(const GameState& gameState, const std::string& filename) {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << gameState.to_json().dump(4);  // Salvare JSON indentat
+        file.close();
+        std::cout << "✔ Progres salvat în " << filename << std::endl;
+    }
+    else {
+        std::cerr << "❌ Eroare la salvarea jocului!" << std::endl;
+    }
+}
+
+GameState loadGame(const std::string& filename) {
+    std::ifstream file(filename);
+    if (file.is_open()) {
+        json j;
+        file >> j;
+        file.close();
+        std::cout << "✔ Progres încărcat din " << filename << std::endl;
+        return GameState::from_json(j);
+    }
+    else {
+        std::cerr << "⚠ Nu s-a găsit fișierul de salvare! Se va începe un joc nou." << std::endl;
+        return {}; // Returnează un GameState gol
+    }
 }
