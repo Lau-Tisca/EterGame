@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 class Card {
 public:
     int value;
+    int originalValue;
     bool isIllusion;
     bool isEther;
     std::string owner;

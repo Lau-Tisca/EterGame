@@ -2,39 +2,85 @@
 
 #include "ExplosionPattern.h"
 #include <vector>
+#include <random>
+#include <iostream>
 #include <utility> // pentru std::pair
 #include <algorithm> // pentru std::find
 #include <cstdlib>   // pentru rand()
 #include <ctime>     // pentru srand()
 
-std::vector<std::pair<int, int>> ExplosionPattern::generateExplosionPattern(int size, int& holeCount) {
-    std::vector<std::pair<int, int>> positions;
-    int effects = (size == 3) ? (rand() % 3 + 2) : (rand() % 4 + 3); // 2-4 pentru 3x3, 3-6 pentru 4x4
-    holeCount = 0;
+ExplosionPattern::ExplosionPattern(int gridSize) {
+    generateExplosion(gridSize);
+}
 
-    // Generează poziții unice pentru efectele exploziei
-    while (positions.size() < effects) {
-        int row = rand() % size;
-        int col = rand() % size;
+ExplosionPattern::ExplosionPattern(std::vector<ExplosionTile> tiles) {
+    affectedTiles = std::move(tiles);
+}
 
-        std::pair<int, int> pos = { row, col };
-        if (std::find(positions.begin(), positions.end(), pos) == positions.end()) {
-            positions.push_back(pos);
+const std::vector<ExplosionTile>& ExplosionPattern::getTiles() const {
+    return affectedTiles;
+}
 
-            // Probabilitatea de 10% pentru a adăuga o groapă
-            if (rand() % 10 == 0) {
-                holeCount++;
-            }
+std::vector<ExplosionTile> ExplosionPattern::generateExplosionPattern(int gridSize, int& holeCount)
+{
+    return std::vector<ExplosionTile>();
+}
+
+void ExplosionPattern::generateExplosion(int gridSize) {
+    affectedTiles.clear();
+    std::vector<std::pair<int, int>> possiblePositions;
+    for (int i = 0; i < gridSize; ++i)
+        for (int j = 0; j < gridSize; ++j)
+            possiblePositions.emplace_back(i, j);
+
+    std::shuffle(possiblePositions.begin(), possiblePositions.end(), std::mt19937(std::random_device{}()));
+
+    int numEffects = (gridSize == 3) ? rand() % 3 + 2 : rand() % 4 + 3;
+    bool hasHole = false;
+    for (int i = 0; i < numEffects; ++i) {
+        ExplosionEffect effect;
+        if (!hasHole || rand() % 10 == 0) {
+            effect = ExplosionEffect::CreateHole;
+            hasHole = true;
+        }
+        else {
+            effect = (rand() % 2 == 0) ? ExplosionEffect::RemoveCard : ExplosionEffect::ReturnToHand;
+        }
+        affectedTiles.push_back({ possiblePositions[i].first, possiblePositions[i].second, effect });
+    }
+}
+
+void ExplosionPattern::applyExplosion(GameBoard& board, int centerRow, int centerCol) {
+    for (const auto& effect : affectedTiles) {
+        int affectedRow = centerRow + effect.x - 1;
+        int affectedCol = centerCol + effect.y - 1;
+
+        if (!board.isValidPosition(affectedRow, affectedCol, 0))
+            continue;
+
+        if (board.isSpaceEmpty(affectedRow, affectedCol))
+            continue;
+
+        switch (effect.effect) {
+        case ExplosionEffect::RemoveCard:
+            board.removeCard(affectedRow, affectedCol);
+            break;
+        case ExplosionEffect::ReturnToHand:
+            board.returnCardToPlayer(affectedRow, affectedCol);
+            break;
+        case ExplosionEffect::CreateHole:
+            board.createHole(affectedRow, affectedCol);
+            break;
         }
     }
-
-    return positions;
 }
+
 
 void ExplosionPattern::rotatePattern(std::vector<std::pair<int, int>>& pattern, int size) {
     for (auto& pos : pattern) {
-        int temp = pos.first;
-        pos.first = pos.second;
-        pos.second = size - 1 - temp;
+        int oldX = pos.first;
+        int oldY = pos.second;
+        pos.first = oldY;
+        pos.second = size - 1 - oldX;
     }
 }
