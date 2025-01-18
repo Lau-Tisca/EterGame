@@ -4,8 +4,15 @@
 #include <memory>
 #include "Card.h"
 #include "Wizard.h"
+#include "MagicPower.h"
+
+class GameBoard;
 
 class Player {
+
+private:
+    std::vector<MagicPower> elementalPowers;
+    bool powerUsed = false;
 public:
     std::string name;
     std::vector<Card> hand;
@@ -17,7 +24,11 @@ public:
     void addCard(const Card& card);
     void removeCard(int index);
 
-    void useWizardAbility(GameBoard& board, int row, int col);
+    void addElementalPower(MagicPower power);
+    bool canUseElementalPower() const;
+    void usePower();
+
+    void useWizardAbility(GameBoard& board, Player& opponent, int row, int col, int destRow = -1, int destCol = -1);
     void resetWizardForGame();
 
     //Getter nume

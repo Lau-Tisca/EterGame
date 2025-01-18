@@ -13,10 +13,27 @@ void Player::removeCard(int index) {
     if (index >= 0 && index < static_cast<int>(hand.size())) {
         hand.erase(hand.begin() + index);
     }
+}
+
+void Player::addElementalPower(MagicPower power) {
+    elementalPowers.push_back(power);
+}
+
+bool Player::canUseElementalPower() const {
+    return !powerUsed && !elementalPowers.empty();
+}
+
+void Player::usePower() {
+    if (canUseElementalPower()) {
+        // Exemplu: marchez că puterea a fost utilizată
+        powerUsed = true;
+        std::cout << name << " used an elemental power.\n";
+    }
     else {
-        throw std::out_of_range("Invalid card index!");
+        std::cout << name << " cannot use an elemental power right now.\n";
     }
 }
+
 
 // Abilitatea vrajitorului
 void Player::useWizardAbility(GameBoard& board, Player& opponent, int row, int col, int destRow, int destCol) {
