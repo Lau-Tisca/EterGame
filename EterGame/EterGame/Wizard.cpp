@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 
 /*
 Wizard::Wizard(const std::string& name, MagicPower power)
@@ -19,9 +22,10 @@ Wizard::Wizard()
     usedThisMatch(false) {
 }
 
-Wizard::Wizard(const std::u8string& name, MagicPower power)
-    : name(name), power(power) {
+Wizard::Wizard(const std::string& name, MagicPower power)
+    : name(name), power(power), usedThisGame(false), usedThisMatch(false) {
 }
+
 
 std::ostream& operator<<(std::ostream& os, const std::u8string& u8str)
 {
@@ -29,7 +33,7 @@ std::ostream& operator<<(std::ostream& os, const std::u8string& u8str)
 }
 
 // Getteri
-std::u8string Wizard::getName() const {
+std::string Wizard::getName() const {
     return name;
 }
 
@@ -99,7 +103,7 @@ void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponen
             std::cout << name << " moved a row to the edge!\n";
             break;
 
-        case MagicPower::CONTROLLED_EXPLOSION:
+        /*case MagicPower::CONTROLLED_EXPLOSION:
             board.controlledExplosion(currentPlayer);
             std::cout << name << " triggered a controlled explosion!\n";
             break;
@@ -112,7 +116,7 @@ void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponen
         case MagicPower::FLAMES:
             board.flames(currentPlayer, opponent);
             std::cout << name << " unleashed flames!\n";
-            break;
+            break;*/
 
         default:
             throw std::runtime_error("Invalid magical power!");
@@ -131,3 +135,49 @@ void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponen
 void Wizard::resetGame() {
     usedThisGame = false; // Resetăm utilizarea doar pentru jocul curent
 }
+
+MagicPower Wizard::getPower() const {
+    return power; // Asumăm că `power` este un membru al clasei `Wizard`.
+}
+
+Wizard Wizard::getRandomWizard()
+{
+    static const std::vector<Wizard> availableWizards = {
+        Wizard("Fire Mage", MagicPower::REMOVE_ROW_WITH_OWN_CARD),
+        Wizard("Ice Mage", MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN),
+        Wizard("Earth Mage", MagicPower::CREATE_HOLE),
+        Wizard("Air Mage", MagicPower::MOVE_STACK_WITH_OWN_CARD),
+        Wizard("Light Mage", MagicPower::GAIN_EXTRA_CARD),
+        Wizard("Dark Mage", MagicPower::COVER_OPPONENT_CARD),
+        Wizard("Water Mage", MagicPower::MOVE_STACK_WITH_OPPONENT_CARD),
+        Wizard("Storm Mage", MagicPower::MOVE_ROW_TO_EDGE)
+    };
+
+    srand(static_cast<unsigned>(time(0))); // Inițializează generatorul de numere aleatoare
+    int randomIndex = rand() % availableWizards.size();
+    return availableWizards[randomIndex];
+}
+
+Wizard Wizard::getRandomWizardDistinctFrom(const Wizard& otherWizard) {
+    static const std::vector<Wizard> availableWizards = {
+        Wizard("Fire Mage", MagicPower::REMOVE_ROW_WITH_OWN_CARD),
+        Wizard("Ice Mage", MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN),
+        Wizard("Earth Mage", MagicPower::CREATE_HOLE),
+        Wizard("Air Mage", MagicPower::MOVE_STACK_WITH_OWN_CARD),
+        Wizard("Light Mage", MagicPower::GAIN_EXTRA_CARD),
+        Wizard("Dark Mage", MagicPower::COVER_OPPONENT_CARD),
+        Wizard("Water Mage", MagicPower::MOVE_STACK_WITH_OPPONENT_CARD),
+        Wizard("Storm Mage", MagicPower::MOVE_ROW_TO_EDGE)
+    };
+
+    srand(static_cast<unsigned>(time(0))); // Inițializează generatorul de numere aleatoare
+
+    Wizard randomWizard;
+    do {
+        int randomIndex = rand() % availableWizards.size();
+        randomWizard = availableWizards[randomIndex];
+    } while (randomWizard.getName() == otherWizard.getName());
+
+    return randomWizard;
+}
+
