@@ -133,6 +133,7 @@
     <ClCompile Include="ExplosionPattern.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameBoard.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Wizard.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameBoard.h" />
     <ClInclude Include="GameMode.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="MagicPower.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Wizard.h" />
