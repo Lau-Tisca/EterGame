@@ -22,6 +22,20 @@ Game::Game(int boardSize, const std::string& player1Name, const std::string& pla
         << ".\n";
 }
 
+Game::Game(int boardSize,
+    const std::string& player1Name,
+    const std::string& player2Name,
+    GameMode mode)
+    : board(boardSize, player1, player2),
+    player1(player1Name, Wizard()),   // add default wizard
+    player2(player2Name, Wizard()), // add default wizard
+    currentPlayer(1),
+    currentMode(mode) {
+    std::cout << "Game initialized for Elements Duel with players: "
+        << player1Name << " and " << player2Name << ".\n";
+}
+
+
 
 void Game::resetPlayerHand(Player& player) {
     // Golește mâna actuală
@@ -402,6 +416,24 @@ void Game::validateCardIndex(int& index, const Player& player) {
         std::cout << "Invalid card index! Enter a valid index (1-" << player.hand.size() << "): ";
         std::cin >> index;
         index -= 1; // Ajustează indexul pentru a începe de la 0
+    }
+}
+
+void Game::checkForExplosion(int lastMoveRow, int lastMoveCol) {
+    Player& activePlayer = (currentPlayer == 1) ? player1 : player2;
+
+    if (!board.canTriggerExplosion()) {
+        std::cout << "[INFO] Not enough full lines to trigger an explosion.\n";
+        return;
+    }
+
+    std::cout << activePlayer.getName() << ", do you want to trigger an explosion? (yes/no): ";
+    std::string choice;
+    std::cin >> choice;
+
+    if (choice == "yes") {
+        board.triggerExplosion(activePlayer);
+        std::cout << "[INFO] Explosion triggered successfully!\n";
     }
 }
 
