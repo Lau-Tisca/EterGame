@@ -21,6 +21,15 @@ const std::vector<ExplosionTile>& ExplosionPattern::getTiles() const {
     return affectedTiles;
 }
 
+void ExplosionPattern::rotatePattern(std::vector<std::pair<int, int>>& pattern, int size) {
+    for (auto& pos : pattern) {
+        int oldX = pos.first;
+        int oldY = pos.second;
+        pos.first = oldY;
+        pos.second = size - 1 - oldX;
+    }
+}
+
 std::vector<ExplosionTile> ExplosionPattern::generateExplosionPattern(int gridSize, int& holeCount)
 {
     return std::vector<ExplosionTile>();
@@ -72,15 +81,5 @@ void ExplosionPattern::applyExplosion(GameBoard& board, int centerRow, int cente
             board.createHole(affectedRow, affectedCol);
             break;
         }
-    }
-}
-
-
-void ExplosionPattern::rotatePattern(std::vector<std::pair<int, int>>& pattern, int size) {
-    for (auto& pos : pattern) {
-        int oldX = pos.first;
-        int oldY = pos.second;
-        pos.first = oldY;
-        pos.second = size - 1 - oldX;
     }
 }

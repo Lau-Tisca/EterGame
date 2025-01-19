@@ -1,6 +1,4 @@
-﻿//GameBoard.cpp
-
-#include <queue>
+﻿#include <queue>
 
 #include "GameBoard.h"
 #include "ExplosionPattern.h"
@@ -29,6 +27,14 @@ GameBoard::GameBoard(int size)
     player1(nullptr),
     player2(nullptr) {
     std::cout << "Initialized board with size: " << size << "x" << size << "\n";
+}
+
+nlohmann::json GameBoard::toJson() const {
+    return nlohmann::json{ {"boardState", boardState} };
+}
+
+void GameBoard::fromJson(const nlohmann::json& jsonData) {
+    boardState = jsonData["boardState"].get<std::vector<std::vector<int>>>();
 }
 
 /// ================================
@@ -137,10 +143,15 @@ bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const P
             if (card.value > topCard.originalValue) {  // Doar o carte mai mare o poate înlocui
                 std::cout << "[SUCCESS] Card " << card.value << " replaces the revealed illusion of value " << topCard.originalValue << ".\n";
 
-                // 🔹 Actualizează owner-ul cărții care înlocuiește iluzia
+                // Actualizează owner-ul cărții care înlocuiește iluzia
                 Card placedCard = card;
                 placedCard.owner = constPlayer.name;
                 board[row][col].push_back(placedCard);
+
+                // Salveaza mutarea in istoric
+                lastPlayedCards.push_back(placedCard);
+                lastPlayedPosition = { row, col };
+
                 return true;
             }
             else {
@@ -150,21 +161,82 @@ bool GameBoard::placeCard(int row, int col, int depth, const Card& card, const P
             }
         }
 
-        // 🔹 Regulă standard: o carte trebuie să fie mai mare decât cea de dedesubt
+        // Regulă standard: o carte trebuie să fie mai mare decât cea de dedesubt
         if (card.value <= topCard.value) {
             std::cerr << "[ERROR] Cannot place a card with value less than or equal to the top card at this position.\n";
             return false;
         }
     }
 
+    // Plaseaza cartea pe tabla
     Card placedCard = card;
     placedCard.owner = constPlayer.name;
     board[row][col].push_back(placedCard);
+
+    // Salveaza mutarea in istoric
+    lastPlayedCards.push_back(placedCard);
+    lastPlayedPosition = { row, col };
+
     std::cout << "[DEBUG] Card placed: value " << placedCard.value
         << " | Owner: " << placedCard.owner
         << " at (" << row << ", " << col << ", " << depth << ")\n";
     return true;
 }
+
+bool GameBoard::placeTCard(int row, int col, int depth, const Card& card, const Player& constPlayer) {
+    std::cout << "[INFO] [Tournament] Attempting to place card at (" << row << ", " << col << ", " << depth << ")...\n";
+
+    // Verifică validitatea poziției
+    if (!isValidPosition(row, col, depth)) {
+        std::cerr << "[ERROR] [Tournament] Invalid position: (" << row << ", " << col << ", " << depth << ").\n";
+        return false;
+    }
+
+    // Dacă cartea este o iluzie, plaseaz-o direct
+    if (card.isIllusion) {
+        board[row][col].push_back(card);
+        std::cout << "[INFO] [Tournament] Illusion placed at (" << row << ", " << col << ") with value " << card.value << ".\n";
+        return true;
+    }
+
+    // 🔹 Dacă există deja o carte, trebuie să fie mai mică
+    if (!board[row][col].empty()) {
+        Card& topCard = board[row][col].back().value();
+
+        // Dacă este o iluzie, o dezvăluim
+        if (topCard.isIllusion) {
+            std::cout << "[INFO] [Tournament] Revealing illusion at (" << row << ", " << col << ")!\n";
+            topCard.isIllusion = false;
+
+            if (card.value > topCard.originalValue) {
+                std::cout << "[SUCCESS] [Tournament] Card " << card.value << " replaces the revealed illusion.\n";
+            }
+            else {
+                std::cerr << "[ERROR] [Tournament] Cannot place card with value " << card.value << " over a revealed illusion!\n";
+                return false;
+            }
+        }
+
+        // Dacă cartea existentă nu este iluzie, trebuie să fie mai mică decât cea nouă
+        else if (card.value <= topCard.value) {
+            std::cerr << "[ERROR] [Tournament] Cannot place card with value " << card.value
+                << " over an existing card with value " << topCard.value << "!\n";
+            return false;
+        }
+    }
+
+    // 🔹 Plasează cartea pe tablă
+    board[row][col].push_back(card);
+    lastPlayedCards.push_back(card);
+    lastPlayedPosition = { row, col };
+    board[row][col].back()->setOwner(constPlayer.getName());
+    std::cout << "[DEBUG] [Tournament] Card placed: value " << card.value
+        << " | Owner: " << card.owner
+        << " at (" << row << ", " << col << ", " << depth << ")\n";
+
+    return true;
+}
+
 
 bool GameBoard::isLineFull(int startRow, int startCol, int dRow, int dCol) const {
     std::cout << "[DEBUG] Checking if line is full starting at (" << startRow << ", " << startCol << ")\n";
@@ -327,6 +399,9 @@ bool GameBoard::canTriggerExplosion() const {
         if (isLineFull(i, 0, 0, 1)) ++fullLines;
         if (isLineFull(0, i, 1, 0)) ++fullLines;
     }
+
+    std::cout << "[DEBUG] Full lines detected: " << fullLines << "\n";
+
     return fullLines >= 2;
 }
 
@@ -557,6 +632,15 @@ void GameBoard::printBoard() const {
     std::cout << "--" << std::string(size * 6, '-') << "|\n";
 }
 
+void GameBoard::resetBoard() {
+    for (auto& row : board) {
+        for (auto& col : row) {
+            col.clear();
+        }
+    }
+    std::cout << "[INFO] Board has been reset.\n";
+}
+
 bool GameBoard::hasAdjacentCard(int row, int col) const {
     std::cout << "Checking adjacency for position (" << row << ", " << col << ")...\n";
     static const int directions[8][2] = { {-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
@@ -631,39 +715,51 @@ bool GameBoard::checkIllusionRule(int row, int col, Player& opponent) {
 /*
  * Elimină o carte a adversarului de pe tablă care acoperă o carte proprie
  */
-void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer) {
+bool GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& currentPlayer) {
     // Verifică dacă poziția este validă
-    if (row < 0 || row >= size || col < 0 || col >= size) {
-        throw std::out_of_range("Invalid position on the board!");
+    if (!isValidPosition(row, col, 0)) {
+        std::cerr << "[ERROR] Invalid position on the board!\n";
+        return false;
     }
 
     // Verifică dacă poziția are cărți
     if (board[row][col].empty()) {
-        throw std::runtime_error("No cards at the given position to remove!");
+        std::cerr << "[ERROR] No cards at the given position to remove!\n";
+        return false;
     }
 
-    // Verifică dacă ultima carte de pe teanc este a oponentului
-    const Card& topCard = board[row][col].back().value();
+    // Verifică dacă ultima carte de pe teanc este a adversarului
+    auto& topCardOpt = board[row][col].back();
+    if (!topCardOpt.has_value()) {
+        std::cerr << "[ERROR] No valid card found at (" << row << ", " << col << ").\n";
+        return false;
+    }
+
+    const Card& topCard = topCardOpt.value();
     if (topCard.owner == currentPlayer.name) {
-        throw std::runtime_error("Cannot remove your own card!");
+        std::cerr << "[ERROR] The top card belongs to you. Cannot remove your own card!\n";
+        return false;
     }
 
-    // Verifică dacă există o carte proprie dedesubt
+    // Verifică dacă există o carte proprie sub cea adversă
     bool hasOwnCardBelow = false;
-    for (size_t depth = 0; depth < board[row][col].size() - 1; ++depth) {
-        if (board[row][col][depth].has_value() && board[row][col][depth]->owner == currentPlayer.name) {
+    for (size_t i = 0; i < board[row][col].size() - 1; ++i) {
+        if (board[row][col][i].has_value() && board[row][col][i]->owner == currentPlayer.name) {
             hasOwnCardBelow = true;
             break;
         }
     }
 
     if (!hasOwnCardBelow) {
-        throw std::runtime_error("No own card below the opponent's card!");
+        std::cerr << "[ERROR] No own card below to justify removing opponent's card!\n";
+        return false;
     }
 
     // Elimină cartea adversarului
     board[row][col].pop_back();
-    std::cout << "Removed opponent's card at (" << row << ", " << col << ").\n";
+    std::cout << "[SUCCESS] Removed opponent's card at (" << row << ", " << col << ").\n";
+
+    return true;
 }
 
 /*
@@ -671,237 +767,297 @@ void GameBoard::removeOpponentCardOverOwn(int row, int col, const Player& curren
  * Rândul trebuie să ocupe cel puțin 3 poziții și să conțină cel puțin o carte proprie vizibilă.
  * Se elimină teancurile, nu numai cărțile de deasupra.
  */
-void GameBoard::removeRowWithOwnCard(int row, const Player& currentPlayer) {
+bool GameBoard::removeRowWithOwnCard(int row, const Player& currentPlayer) {
     // Verifică dacă rândul este valid
     if (row < 0 || row >= size) {
         throw std::out_of_range("Invalid row index!");
     }
 
-    // Verifică dacă rândul îndeplinește condițiile
     int occupiedPositions = 0;
-    bool hasOwnCard = false;
+    int ownCardsCount = 0;
 
-    for (int col = 0; col < size; ++col) {
-        if (!board[row][col].empty()) {
-            ++occupiedPositions;
-            // Verifică dacă există o carte a jucătorului curent la această poziție
-            for (const auto& card : board[row][col]) {
-                if (card.has_value() && card->owner == currentPlayer.name) {
-                    hasOwnCard = true;
-                    break;
+    for (auto& column : board[row]) {
+        if (!column.empty()) {
+            occupiedPositions++;
+            for (auto& cardOpt : column) {
+                if (cardOpt.has_value() && cardOpt->owner == currentPlayer.name) {
+                    ownCardsCount++;
+                    break; // Ne interesează doar dacă există o carte proprie
                 }
             }
         }
     }
 
-    // Condiții: minim 3 poziții ocupate și cel puțin o carte proprie
     if (occupiedPositions < 3) {
         throw std::runtime_error("The row must occupy at least 3 positions!");
     }
-    if (!hasOwnCard) {
-        throw std::runtime_error("The row must contain at least one of your cards!");
+
+    if (ownCardsCount == 0) {
+        std::cerr << "[ERROR] Cannot remove row " << row << ". No own cards found!\n";
+        return false;
     }
 
-    // Elimină toate cărțile din rând
-    for (int col = 0; col < size; ++col) {
-        if (!board[row][col].empty()) {
-            board[row][col].clear(); // Șterge toate nivelurile
-        }
+    for (auto& column : board[row]) {
+        column.clear();
     }
 
-    std::cout << "Removed all cards from row " << row << ".\n";
+    std::cout << "[SUCCESS] Removed all cards from row " << row << ".\n";
+    return true;
 }
 /*
  * Acoperă o carte a oponentului cu o carte proprie de valoare strict mai mică din mână.
  */
-void GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
+bool GameBoard::coverOpponentCard(int row, int col, Player& currentPlayer) {
     // Verifică dacă poziția este validă
-    if (row < 0 || row >= size || col < 0 || col >= size) {
-        throw std::out_of_range("Invalid position on the board!");
+    if (!isValidPosition(row, col, 0)) {
+        std::cerr << "[ERROR] Invalid position on the board!\n";
+        return false;
     }
 
     // Verifică dacă există un teanc de cărți la poziția specificată
     if (board[row][col].empty()) {
-        throw std::runtime_error("No stack exists at the given position!");
+        std::cerr << "[ERROR] No card exists at the given position!\n";
+        return false; // Nu există nimic de acoperit
     }
 
-    // Obține cartea de deasupra
-    const Card& topCard = board[row][col].back().value();
+    // Verifică dacă există o carte validă în vârf
+    auto& topCardOpt = board[row][col].back();
+    if (!topCardOpt.has_value()) {
+        std::cerr << "[ERROR] No valid card found at (" << row << ", " << col << ").\n";
+        return false; // Teancul conține `nullopt`
+    }
 
-    // Verifică dacă cartea de deasupra aparține adversarului
+    const Card& topCard = topCardOpt.value();
+
+    // Verifică dacă este o carte a adversarului
     if (topCard.owner == currentPlayer.name) {
-        throw std::runtime_error("You cannot cover your own card!");
+        std::cerr << "[ERROR] You cannot cover your own card!\n";
+        return false; // Nu poți acoperi propria carte
     }
 
-    // Găsește o carte din mâna jucătorului curent care are valoarea mai mică decât cea a cărții de deasupra
-    auto it = std::find_if(currentPlayer.hand.begin(), currentPlayer.hand.end(),
-        [&](const Card& card) {
-            return card.value < topCard.value && !card.isIllusion; // Trebuie să fie mai mică și să nu fie o iluzie
+    // Găsește o carte validă în mână
+    auto it = std::find_if(currentPlayer.hand.begin(),
+        currentPlayer.hand.end(),
+        [&topCard](const Card& card)
+        {
+            return card.value < topCard.value && !card.isIllusion;
         });
 
-    // Dacă nu există o astfel de carte, aruncă o excepție
     if (it == currentPlayer.hand.end()) {
-        throw std::runtime_error("No valid card in hand to cover the opponent's card!");
+        std::cerr << "[ERROR] No valid card available to cover opponent's card!\n";
+        return false; // Nicio carte validă disponibilă
     }
 
-    // Plasează cartea jucătorului curent peste teanc
-    board[row][col].emplace_back(*it);
+    // Plasează cartea jucătorului peste cartea adversarului
+    Card coveringCard = *it;
+    coveringCard.owner = currentPlayer.name;
+    board[row][col].push_back(coveringCard);
 
-    // Elimină cartea din mâna jucătorului curent
+    // Elimină cartea folosită din mâna jucătorului
     currentPlayer.hand.erase(it);
 
-    std::cout << "Covered opponent's card at (" << row << ", " << col
-        << ") with your card of value " << board[row][col].back()->value << ".\n";
+    std::cout << "[SUCCESS] Covered opponent's card at (" << row << ", " << col
+        << ") with your card of value " << coveringCard.value << ".\n";
+
+    return true;
 }
 
 /*
  * Mută un teanc de cărți cu propria carte deasupra pe o altă poziție goală pe tablă.
 */
-void GameBoard::moveStackWithOwnCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer) {
+bool GameBoard::moveStackWithOwnCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer) {
     // Verifică dacă pozițiile sunt valide
-    if (srcRow < 0 || srcRow >= size || srcCol < 0 || srcCol >= size ||
-        destRow < 0 || destRow >= size || destCol < 0 || destCol >= size) {
-        throw std::out_of_range("Invalid source or destination position!");
+    if (!isValidPosition(srcRow, srcCol, 0) || !isValidPosition(destRow, destCol, 0)) {
+        std::cerr << "[ERROR] Invalid source or destination position!\n";
+        return false;
     }
 
     // Verifică dacă sursa conține un teanc de cărți
     if (board[srcRow][srcCol].empty()) {
-        throw std::runtime_error("No stack exists at the source position!");
+        std::cerr << "[ERROR] No stack at source position!\n";
+        return false;
     }
 
     // Verifică dacă poziția țintă este goală
     if (!board[destRow][destCol].empty()) {
-        throw std::runtime_error("The destination position is not empty!");
+        std::cerr << "[ERROR] Destination must be empty!\n";
+        return false;
     }
 
     // Verifică dacă ultima carte din teancul sursă aparține jucătorului curent
-    const Card& topCard = board[srcRow][srcCol].back().value();
-    if (topCard.owner != currentPlayer.name) {
-        throw std::runtime_error("You can only move stacks where your card is on top!");
+    auto& topCardOpt = board[srcRow][srcCol].back();
+    if (!topCardOpt.has_value() || topCardOpt->owner != currentPlayer.name) {
+        std::cerr << "[ERROR] You can only move stacks where your card is on top!\n";
+        return false;
     }
 
     // Mută teancul
     board[destRow][destCol] = std::move(board[srcRow][srcCol]);
     board[srcRow][srcCol].clear();
 
-    std::cout << "Moved stack from (" << srcRow << ", " << srcCol << ") to ("
-        << destRow << ", " << destCol << ").\n";
+    std::cout << "[SUCCESS] Moved stack from ("
+        << srcRow << ", "
+        << srcCol << ") to ("
+        << destRow << ", "
+        << destCol << ").\n";
+
+    return true;
 }
 
 /*
  * Capătă o extra carte Eter care se plasează imediat pe tablă.
  */
-void GameBoard::placeEtherCard(int row, int col, const Player& currentPlayer) {
+bool GameBoard::placeEtherCard(int row, int col, const Player& currentPlayer) {
     // Verifică dacă poziția este validă
-    if (row < 0 || row >= size || col < 0 || col >= size) {
-        throw std::out_of_range("Invalid position on the board!");
+    if (!isValidPosition(row, col, 0)) {
+        std::cerr << "[ERROR] Invalid position on the board for Ether card!\n";
+        return false;
     }
 
     // Verifică dacă poziția este marcată ca o groapă
     if (isHole(row, col)) {
-        throw std::runtime_error("Cannot place Ether card on a hole!");
+        std::cerr << "[ERROR] Cannot place Ether card on a hole at (" << row << ", " << col << ")!\n";
+        return false;
     }
 
     // Verifică dacă poziția este goală
     if (!board[row][col].empty()) {
-        throw std::runtime_error("Cannot place Ether card on a non-empty position!");
+        std::cerr << "[ERROR] Position (" << row << ", " << col << ") is already occupied!\n";
+        return false;
+    }
+
+    if (!isFirstMove && !hasAdjacentCard(row, col)) {
+        std::cerr << "[ERROR] Ether card must be placed adjacent to existing cards!\n";
+        return false;
     }
 
     // Plasează cartea Ether pe poziția specificată
-    board[row][col].emplace_back(Card(0, false, true, currentPlayer.name));
+    Card etherCard(0, false, true, currentPlayer.name);
+    board[row][col].push_back(etherCard);
 
-    std::cout << "Placed Ether card at (" << row << ", " << col << ") for "
+    std::cout << "[SUCCESS] Placed Ether card at ("
+        << row << ", " << col << ") for "
         << currentPlayer.name << ".\n";
+
+    return true;
 }
 
 /*
  * Mută un teanc de cărți cu cartea adversarului deasupra pe o altă poziție goală pe tablă.
  */
-void GameBoard::moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer) {
+bool GameBoard::moveStackWithOpponentCard(int srcRow, int srcCol, int destRow, int destCol, const Player& currentPlayer) {
     // Verifică dacă pozițiile sunt valide
-    if (srcRow < 0 || srcRow >= size || srcCol < 0 || srcCol >= size ||
-        destRow < 0 || destRow >= size || destCol < 0 || destCol >= size) {
-        throw std::out_of_range("Invalid source or destination position!");
+    if (!isValidPosition(srcRow, srcCol, 0) || !isValidPosition(destRow, destCol, 0)) {
+        std::cerr << "[ERROR] Invalid source or destination position!\n";
+        return false;
     }
 
     // Verifică dacă sursa conține un teanc de cărți
     if (board[srcRow][srcCol].empty()) {
-        throw std::runtime_error("No stack exists at the source position!");
+        std::cerr << "[ERROR] No stack at source position (" << srcRow << ", " << srcCol << ")!\n";
+        return false;
     }
 
     // Verifică dacă poziția țintă este goală
     if (!board[destRow][destCol].empty()) {
-        throw std::runtime_error("The destination position is not empty!");
+        std::cerr << "[ERROR] Destination position (" << destRow << ", " << destCol << ") is not empty!\n";
+        return false;
     }
 
     // Obține cartea de deasupra teancului de la poziția sursă
-    const Card& topCard = board[srcRow][srcCol].back().value();
+    auto& topCardOpt = board[srcRow][srcCol].back();
+    if (!topCardOpt.has_value()) {
+        std::cerr << "[ERROR] No valid card found at source position (" << srcRow << ", " << srcCol << ").\n";
+        return false;
+    }
+
+    const Card& topCard = topCardOpt.value();
 
     // Verifică dacă ultima carte din teanc aparține adversarului
     if (topCard.owner == currentPlayer.name) {
-        throw std::runtime_error("You can only move stacks with the opponent's card on top!");
+        std::cerr << "[ERROR] You cannot move a stack where your card is on top!\n";
+        return false;
+    }
+
+    // Verifică regula de conectivitate (teancurile trebuie să rămână conectate)
+    if (!isFirstMove && !hasAdjacentCard(destRow, destCol)) {
+        std::cerr << "[ERROR] Cannot move stack! The destination position must be adjacent to another card!\n";
+        return false;
     }
 
     // Mută teancul
     board[destRow][destCol] = std::move(board[srcRow][srcCol]);
     board[srcRow][srcCol].clear();
 
-    std::cout << "Moved stack with opponent's card from (" << srcRow << ", " << srcCol
-        << ") to (" << destRow << ", " << destCol << ").\n";
+    std::cout << "[SUCCESS] Moved stack with opponent's card from ("
+        << srcRow << ", " << srcCol << ") to ("
+        << destRow << ", " << destCol << ").\n";
+
+    return true;
 }
 
 /*
  *Mută oricare rând aflat la “marginea” tablei pe o altă “margine”. Rândul mutat trebuie să ocupe cel puțin 3 poziții.
-*/
-void GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) {
-    // Verifică dacă pozițiile sursă și destinație sunt pe marginea tablei
-    if (!((srcRow == 0 || srcRow == size - 1 || srcCol == 0 || srcCol == size - 1) &&
-        (destRow == 0 || destRow == size - 1 || destCol == 0 || destCol == size - 1))) {
-        throw std::runtime_error("Source and destination must be on the edges of the board!");
-    }
+ */
+bool GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) {
+    // Verifică dacă sursa și destinația sunt pe marginea tablei
+    auto isEdge = [this](int row, int col) {
+        return row == 0 || row == size - 1 || col == 0 || col == size - 1;
+        };
 
-    // Verifică dacă rândul sau coloana sursă este validă
-    int occupiedPositions = 0;
-    if (srcRow == 0 || srcRow == size - 1) { // Mutare pe orizontală
-        for (int col = 0; col < size; ++col) {
-            if (!board[srcRow][col].empty()) {
-                ++occupiedPositions;
-            }
-        }
-    }
-    else if (srcCol == 0 || srcCol == size - 1) { // Mutare pe verticală
-        for (int row = 0; row < size; ++row) {
-            if (!board[row][srcCol].empty()) {
-                ++occupiedPositions;
-            }
-        }
-    }
-    else {
-        throw std::runtime_error("Invalid source row/column!");
+    if (!isEdge(srcRow, srcCol) || !isEdge(destRow, destCol)) {
+        std::cerr << "[ERROR] Both source (" << srcRow << ", " << srcCol
+            << ") and destination (" << destRow << ", " << destCol
+            << ") must be on the edge of the board!\n";
+        return false;
     }
 
     // Verifică dacă sursa conține cel puțin 3 poziții ocupate
-    if (occupiedPositions < 3) {
-        throw std::runtime_error("The source row/column must occupy at least 3 positions!");
+    int occupiedPositions = 0;
+    if (srcRow == 0 || srcRow == size - 1) { // Mutare pe orizontală
+        for (const auto& col : board[srcRow]) {
+            if (!col.empty()) occupiedPositions++;
+        }
+    }
+    else { // Mutare pe verticală
+        for (const auto& row : board) {
+            if (!row[srcCol].empty()) occupiedPositions++;
+        }
     }
 
-    // Verifică dacă destinația este complet goală
+    if (occupiedPositions < 3) {
+        std::cerr << "[ERROR] Cannot move row/column! It must contain at least 3 occupied positions!\n";
+        return false;
+    }
+
+    // Verifică dacă noua poziție respectă regula adiacenta
+    if (!isFirstMove && !hasAdjacentCard(destRow, destCol)) {
+        std::cerr << "[ERROR] Cannot move row/column! The new position must be adjacent to another card!\n";
+        return false;
+    }
+
+    // Verifică dacă destinația este goală
+    bool destinationEmpty = true;
     if (destRow == 0 || destRow == size - 1) { // Mutare pe orizontală
-        for (int col = 0; col < size; ++col) {
-            if (!board[destRow][col].empty()) {
-                throw std::runtime_error("Destination row is not empty!");
+        for (const auto& col : board[destRow]) {
+            if (!col.empty()) {
+                destinationEmpty = false;
+                break;
             }
         }
     }
-    else if (destCol == 0 || destCol == size - 1) { // Mutare pe verticală
-        for (int row = 0; row < size; ++row) {
-            if (!board[row][destCol].empty()) {
-                throw std::runtime_error("Destination column is not empty!");
+    else { // Mutare pe verticală
+        for (const auto& row : board) {
+            if (!row[destCol].empty()) {
+                destinationEmpty = false;
+                break;
             }
         }
     }
-    else {
-        throw std::runtime_error("Invalid destination row/column!");
+
+    if (!destinationEmpty) {
+        std::cerr << "[ERROR] The destination row/column must be completely empty to allow movement!\n";
+        return false;
     }
 
     // Mută rândul sau coloana
@@ -911,16 +1067,124 @@ void GameBoard::moveRowToEdge(int srcRow, int srcCol, int destRow, int destCol) 
             board[srcRow][col].clear();
         }
     }
-    else if (srcCol == 0 || srcCol == size - 1) { // Mutare pe verticală
+    else { // Mutare pe verticală
         for (int row = 0; row < size; ++row) {
             board[row][destCol] = std::move(board[row][srcCol]);
             board[row][srcCol].clear();
         }
     }
 
-    std::cout << "Moved row/column from edge (" << srcRow << ", " << srcCol
+    std::cout << "[SUCCESS] Moved row/column from edge (" << srcRow << ", " << srcCol
         << ") to edge (" << destRow << ", " << destCol << ").\n";
+
+    return true;
 }
 
+bool GameBoard::applyDestruction(const Player& currentPlayer)
+{
+    // Verifică dacă există o carte precedentă jucată de adversar
+    if (lastPlayedCards.empty() || lastPlayedCards.back().owner == currentPlayer.name) {
+        return false; // Nu există o carte validă de eliminat
+    }
 
+    auto [row, col] = lastPlayedPosition; // Ultima poziție unde a fost jucată o carte
+    if (row < 0 || col < 0 || row >= size || col >= size || board[row][col].empty()) {
+        return false; // Poziție invalidă sau goală
+    }
 
+    // Elimină cartea din joc
+    board[row][col].pop_back();
+    return true;
+}
+
+bool GameBoard::applyFlames(const Player& currentPlayer) {
+    // FLAMES: Dezvăluie o iluzie adversă și permite jucătorului să plaseze o carte oriunde
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            if (!board[row][col].empty() && board[row][col].back()->isIllusion) {
+                board[row][col].back()->isIllusion = false;  // Iluzia este dezvăluită
+                std::cout << "[FLAMES] Revealed illusion at (" << row << ", " << col << ")!\n";
+                return true;
+            }
+        }
+    }
+    std::cout << "[FLAMES] No illusion found to reveal.\n";
+    return false;
+}
+
+bool GameBoard::applyLava(const Player& currentPlayer) {
+    // LAVA: Toate cărțile vizibile de o anumită valoare sunt returnate în mâinile proprietarilor
+    int targetValue = -1;
+    std::cout << "Choose a card value to remove (must have at least 2 visible instances on board): ";
+    std::cin >> targetValue;
+
+    int count = 0;
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            if (!board[row][col].empty() && board[row][col].back()->value == targetValue) {
+                count++;
+            }
+        }
+    }
+
+    if (count < 2) {
+        std::cout << "[LAVA] Not enough cards of value " << targetValue << " on board.\n";
+        return false;
+    }
+
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            if (!board[row][col].empty() && board[row][col].back()->value == targetValue) {
+                returnCardToPlayer(row, col);
+            }
+        }
+    }
+
+    std::cout << "[LAVA] All cards of value " << targetValue << " were returned to their owners.\n";
+    return true;
+}
+
+bool GameBoard::applyFromAshes(Player& currentPlayer) {
+    // FROM ASHES: Jucătorul poate relua ultima sa carte eliminată
+    if (!currentPlayer.hasDiscardedCards()) {
+        std::cout << "[FROM ASHES] No discarded cards to recover!\n";
+        return false;
+    }
+
+    Card revivedCard = currentPlayer.getLastDiscardedCard();
+    currentPlayer.addCard(revivedCard);
+
+    std::cout << "[FROM ASHES] " << currentPlayer.getName() << " retrieved " << revivedCard.value << " from ashes!\n";
+    return true;
+}
+
+bool GameBoard::applySparks(Player& currentPlayer) {
+    // SPARKS: Mută o carte proprie acoperită de adversar într-o altă poziție liberă
+    for (int row = 0; row < size; ++row) {
+        for (int col = 0; col < size; ++col) {
+            if (board[row][col].size() > 1 && board[row][col][0].has_value()
+                && board[row][col][0]->owner == currentPlayer.name) {
+
+                // Găsește o poziție liberă
+                for (int newRow = 0; newRow < size; ++newRow) {
+                    for (int newCol = 0; newCol < size; ++newCol) {
+                        if (board[newRow][newCol].empty()) {
+
+                            // Mută cartea extrăgând valoarea din `std::optional`
+                            board[newRow][newCol].push_back(std::move(board[row][col][0].value()));
+
+                            // Elimină cartea veche din poziția inițială
+                            board[row][col].erase(board[row][col].begin());
+
+                            std::cout << "[SPARKS] Moved card to (" << newRow << ", " << newCol << ").\n";
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    std::cout << "[SPARKS] No covered card found to move.\n";
+    return false;
+}
