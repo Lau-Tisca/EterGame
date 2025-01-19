@@ -1,36 +1,52 @@
-﻿#include "Game.h"
+﻿// Source.cpp
+
+#include "Game.h"
 #include "GameState.h"
 #include <iostream>
 #include <stdlib.h> 
 #include <Windows.h>
 #include <regex>
+#include <string>
 #include <map>
 #include <functional>
-//#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 
+
+// Golire consola pt aspect mai curat
 void clearConsole();
 
+// Headere pt functiile modurilor de joc
 // Mod antrenament
 void trainingMode();
+
 // Duel vrajitori
 void wizardsDuel();
-//Duel elemente
 
+// Duel elemente
 void elementsDuel();
-// Modul turneu
 
+// Modul turneu
+void tournamentMode();
+
+// Parola
 bool checkPass(const std::string& parola) {
     std::regex pattern(R"([E|e]ter123)");
-    return std::regex_match(parola, pattern);
+    if (std::regex_match(parola, pattern)) {
+        return true;
+    }
+    else {
+        std::cout << "Wrong password\n";
+    }
+    return false;
 }
 
 int main() {
     std::string password;
 
     do {
-        std::cout << "Write password: ";
+        std::cout << "Write password (eter123) : ";
         std::cin >> password;
-        std::cout << "Wrong password!\n";
+        //std::cout << "Wrong password!\n";
     } while (!checkPass(password));
 
     srand(static_cast<unsigned>(time(0)));
@@ -39,16 +55,15 @@ int main() {
     std::string choice;
     GameState gameState;
 
-    std::cout << "🔹 Vrei să încarci progresul anterior? (da/nu): ";
+    std::cout << "Load previous game? (yes/no): ";
     std::cin >> choice;
 
-    if (choice == "da") {
-        gameState = loadGame(); // Încarcă progresul din `savegame.json`
+    if (choice == "yes") {
+        gameState = GameState::loadGame();
+        gameState.game.startGame(); // Continuă automat jocul salvat
     }
-    else {
-        std::cout << "🆕 Începem un joc nou!\n";
-        gameState = {}; // Inițializează un nou joc
-    }
+
+    //gameState.game.start(); // Pornire joc
 
     unsigned short int choiceMenu = 0;
 
@@ -56,7 +71,7 @@ int main() {
         {1, trainingMode},
         {2, wizardsDuel},
         {3, elementsDuel},
-        {4, []() { std::cout << "Modul Turneu (Momentan nu este disponibil).\n"; }},
+        {4, tournamentMode},
         {5, []() { std::cout << "Modul Viteză (Momentan nu este disponibil).\n"; }},
         {6, []() { std::cout << "Leaving Game.\n\n"; }}
     };
@@ -91,86 +106,22 @@ int main() {
         else {
             std::cout << "Invalid choice. Please try again.\n\n";
         }
-
-        /*switch (choice) {
-        case 1:
-            trainingMode();
-            break;
-        case 2:
-            wizardsDuel();
-            break;
-        case 3:
-            //elementsDuel();
-            break;
-        case 4:
-            //tournamentMode();
-            break;
-        case 5:
-            //speedMode();
-            break;
-        case 6:
-            std::cout << "Leaving Game.\n\n";
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again.\n\n";
-            break;
-        }*/
     } while (choiceMenu != 6);
+
+    gameState.saveGame(); // Salvare progres la final
 
     return 0;
 }
 
 void clearConsole() {
+#ifdef _WIN32
     system("CLS");
-    /*
-    // Adaugare debug
-
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hConsole == INVALID_HANDLE_VALUE) {
-        std::cerr << "Error: Invalid handle\n";
-        return;
-    }
-
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-    if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-        std::cerr << "Error: Unable to get console screen buffer info\n";
-        return;
-    }
-
-    DWORD consoleSize;
-    DWORD charsWritten;
-
-    if (!FillConsoleOutputCharacter(hConsole, ' ', consoleSize, { 0, 0 }, &charsWritten)) {
-        std::cerr << "Error: Unable to fill console output character\n";
-        return;
-    }
-
-    if (!FillConsoleOutputAttribute(hConsole, csbi.wAttributes, consoleSize, { 0, 0 }, &charsWritten)) {
-        std::cerr << "Error: Unable to fill console output attribute\n";
-        return;
-    }
-
-    if (!SetConsoleCursorPosition(hConsole, { 0, 0 })) {
-        std::cerr << "Error: Unable to set console cursor position\n";
-        return;
-    }
-
-    // Obține dimensiunea bufferului consolei
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    consoleSize = csbi.dwSize.X * csbi.dwSize.Y;
-
-    // Umple bufferul cu spații
-    FillConsoleOutputCharacter(hConsole, ' ', consoleSize, { 0, 0 }, &charsWritten);
-
-    // Resetează atributele consolei
-    FillConsoleOutputAttribute(hConsole, csbi.wAttributes, consoleSize, { 0, 0 }, &charsWritten);
-
-    // Mutați cursorul la început
-    SetConsoleCursorPosition(hConsole, { 0, 0 });*/
+#else
+    system("clear");
+#endif
 }
 
-// Mod antrenament
+//Mod antrenament
 void trainingMode() {
     //clearConsole();
     std::cout << "Starting Training Mode...\n";
@@ -307,6 +258,7 @@ void trainingMode() {
     std::cin.get();
 }
 
+// Lista de vrăjitori disponibili pentru duelul vrăjitorilor
 const std::vector<Wizard> availableWizards = {
     Wizard("Fire Mage", MagicPower::REMOVE_ROW_WITH_OWN_CARD),
     Wizard("Ice Mage", MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN),
@@ -318,8 +270,9 @@ const std::vector<Wizard> availableWizards = {
     Wizard("Storm Mage", MagicPower::MOVE_ROW_TO_EDGE)
 };
 
-
+//Duelul vrajitorilor
 void wizardsDuel() {
+    //clearConsole();
     std::cout << "Starting Wizard's Duel...\n";
 
     // Randomizare vrăjitori
@@ -334,14 +287,17 @@ void wizardsDuel() {
     Wizard wizard2 = availableWizards[index2];
 
     // Configurare joc
-    Game game(4, 
-              "Player 1", 
-              "Player 2",
-              wizard1,
-              wizard2,
-              GameMode::WizardsDuel);
+    Game game(4,
+        "Player 1",
+        "Player 2",
+        wizard1,
+        wizard2,
+        GameMode::WizardsDuel);
 
-    // Configurare cărți pentru fiecare jucător
+    // Configurare manuală a mâinilor în cazul în care `resetGame()` eșuează
+    game.getPlayer1().hand.clear();
+    game.getPlayer2().hand.clear();
+
     for (int i = 0; i < 2; ++i) {
         game.getPlayer1().addCard(Card(1));
         game.getPlayer2().addCard(Card(1));
@@ -356,34 +312,94 @@ void wizardsDuel() {
     }
     game.getPlayer1().addCard(Card(4));
     game.getPlayer2().addCard(Card(4));
-    game.getPlayer1().addCard(Card(0, false, true)); // Eter
-    game.getPlayer2().addCard(Card(0, false, true)); // Eter
+    game.getPlayer1().addCard(Card(0, false, true)); // Ether
+    game.getPlayer2().addCard(Card(0, false, true)); // Ether
 
     // Format meci: 3/5
+    // Configurare scoruri
     int player1Wins = 0;
     int player2Wins = 0;
 
     while (player1Wins < 3 && player2Wins < 3) {
-        game.resetGame();
-        game.start();
+        std::cout << "\nStarting a new round...\n";
+        game.resetGame(); // Reseteaza tabla si mainile jucatorilor
 
-        // Determină câștigătorul și actualizează scorul
-        int score1 = game.getBoard().calculateScore(game.getPlayer1());
-        int score2 = game.getBoard().calculateScore(game.getPlayer2());
+        int currentPlayer = 1; // Player 1 incepe fiecare runda
 
-        if (score1 > score2) {
-            std::cout << game.getPlayer1().getName() << " wins this game!\n";
-            ++player1Wins;
-        }
-        else if (score2 > score1) {
-            std::cout << game.getPlayer2().getName() << " wins this game!\n";
-            ++player2Wins;
-        }
-        else {
-            std::cout << "This game is a tie!\n";
+        while (true) {
+            game.getBoard().printBoard();
+
+            /// NOU
+            Player& activePlayer = (currentPlayer == 1) ? game.getPlayer1() : game.getPlayer2();
+            Player& opponent = (currentPlayer == 1) ? game.getPlayer2() : game.getPlayer1();
+
+            // Jucătorul activ își face mutarea
+            std::cout << activePlayer.getName() << "'s turn.\n";
+
+            // Alege între plasarea unei iluzii sau unei cărți normale
+            std::string choice;
+
+            if (!activePlayer.wizard.usedThisMatch) {
+                while (true) {
+                    std::cout << activePlayer.getName() << ", do you want to use your wizard's ability? (yes/no): ";
+                    std::cin >> choice;
+
+                    if (choice == "yes") {
+                        if (game.useWizardAbility(activePlayer, opponent)) {
+                            activePlayer.wizard.usedThisMatch = true;
+                            currentPlayer = (currentPlayer == 1) ? 2 : 1; // Schimbă jucătorul
+                            break; // Sare la următorul tur
+                        }
+                    }
+                    else if (choice == "no") {
+                        break;
+                    }
+                    else {
+                        std::cout << "Invalid input! Please answer 'yes' or 'no'.\n";
+                    }
+                }
+            }
+
+
+            std::cout << "Do you want to place an illusion? (yes/no): ";
+            std::cin >> choice;
+
+            while (choice != "yes" && choice != "no") {
+                std::cout << "Invalid input! Please answer 'yes' or 'no': ";
+                std::cin >> choice;
+            }
+
+            bool moveSuccessful = false;
+            if (choice == "yes") {
+                moveSuccessful = game.placeIllusion(activePlayer, game.getBoard());
+            }
+            else {
+                moveSuccessful = game.placeNormalCard(activePlayer, game.getBoard(), opponent);
+            }
+
+            if (!moveSuccessful) {
+                std::cout << activePlayer.getName() << " made an invalid move. Turn lost.\n";
+            }
+
+            // Verifică condiția de câștig după mutare
+            std::string winCondition = game.getBoard().checkWinCondition(activePlayer);
+            if (!winCondition.empty()) {
+                std::cout << activePlayer.getName() << " wins this round with " << winCondition << "!\n";
+                if (currentPlayer == 1) {
+                    ++player1Wins;
+                }
+                else {
+                    ++player2Wins;
+                }
+                break; // Iese din bucla rundei
+            }
+
+            // Alternarea jucătorilor
+            currentPlayer = (currentPlayer == 1) ? 2 : 1;
         }
 
-        std::cout << "Current score: " << game.getPlayer1().getName() << " " << player1Wins
+        std::cout << "Current score: "
+            << game.getPlayer1().getName() << " " << player1Wins
             << " - " << player2Wins << " " << game.getPlayer2().getName() << "\n";
     }
 
@@ -396,6 +412,7 @@ void wizardsDuel() {
     }
 }
 
+// Lista de puteri ale elementelor pentru elementsDuel
 const std::vector<MagicPower> availableElementalPowers = {
     MagicPower::CONTROLLED_EXPLOSION,
     MagicPower::DESTRUCTION,
@@ -539,4 +556,38 @@ void elementsDuel() {
     else {
         std::cout << game.getPlayer2().getName() << " wins the match!\n";
     }
+}
+
+void tournamentMode() {
+    std::cout << "Starting Pure Tournament Mode...\n";
+
+    // Inițializare joc pentru modul turneu
+    Game game(3,
+        "Player 1",
+        "Player 2",
+        GameMode::Tournament);
+
+    // Configurarea mâinilor pentru fiecare jucător
+    for (int i = 0; i < 2; ++i) {
+        game.getPlayer1().addCard(Card(1));
+        game.getPlayer2().addCard(Card(1));
+    }
+    for (int i = 0; i < 2; ++i) {
+        game.getPlayer1().addCard(Card(2));
+        game.getPlayer2().addCard(Card(2));
+    }
+    for (int i = 0; i < 2; ++i) {
+        game.getPlayer1().addCard(Card(3));
+        game.getPlayer2().addCard(Card(3));
+    }
+    game.getPlayer1().addCard(Card(4));
+    game.getPlayer2().addCard(Card(4));
+
+    // 🏆 Începerea turneului
+    game.startTournament();
+
+    // Așteaptă input pentru a reveni la meniu
+    std::cout << "Press Enter to return to the main menu...";
+    std::cin.ignore();
+    std::cin.get();
 }

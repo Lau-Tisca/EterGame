@@ -1,19 +1,13 @@
-﻿#include "MagicPower.h"
+﻿//Wizard.cpp
+
 #include "Wizard.h"
 #include "GameBoard.h"
 #include "Player.h"
-
 #include <stdexcept>
 #include <iostream>
-#include <string>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-
-/*
-Wizard::Wizard(const std::string& name, MagicPower power)
-    : name(name), power(power), usedThisGame(false), usedThisMatch(false) {
-}*/
 
 Wizard::Wizard()
     : name("Default Wizard"),
@@ -23,21 +17,12 @@ Wizard::Wizard()
 }
 
 Wizard::Wizard(const std::string& name, MagicPower power)
-    : name(name), power(power), usedThisGame(false), usedThisMatch(false) {
+    : name(name),
+    power(power),
+    usedThisGame(false),
+    usedThisMatch(false) {
 }
 
-
-std::ostream& operator<<(std::ostream& os, const std::u8string& u8str)
-{
-    return os << std::string(u8str.begin(), u8str.end());
-}
-
-// Getteri
-std::string Wizard::getName() const {
-    return name;
-}
-
-// puterile
 void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponent, int row, int col, int destRow, int destCol) {
     if (usedThisMatch) {
         throw std::runtime_error("The magical power has already been used this match!");
@@ -102,21 +87,21 @@ void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponen
             board.moveRowToEdge(row, col, destRow, destCol);
             std::cout << name << " moved a row to the edge!\n";
             break;
+            /*
+            case MagicPower::CONTROLLED_EXPLOSION:
+                board.controlledExplosion(currentPlayer);
+                std::cout << name << " triggered a controlled explosion!\n";
+                break;
 
-        /*case MagicPower::CONTROLLED_EXPLOSION:
-            board.controlledExplosion(currentPlayer);
-            std::cout << name << " triggered a controlled explosion!\n";
-            break;
+            case MagicPower::DESTRUCTION:
+                board.destruction(currentPlayer);
+                std::cout << name << " caused destruction!\n";
+                break;
 
-        case MagicPower::DESTRUCTION:
-            board.destruction(currentPlayer);
-            std::cout << name << " caused destruction!\n";
-            break;
-
-        case MagicPower::FLAMES:
-            board.flames(currentPlayer, opponent);
-            std::cout << name << " unleashed flames!\n";
-            break;*/
+            case MagicPower::FLAMES:
+                board.flames(currentPlayer, opponent);
+                std::cout << name << " unleashed flames!\n";
+                break;*/
 
         default:
             throw std::runtime_error("Invalid magical power!");
@@ -133,7 +118,12 @@ void Wizard::useAbility(GameBoard& board, Player& currentPlayer, Player& opponen
 }
 
 void Wizard::resetGame() {
-    usedThisGame = false; // Resetăm utilizarea doar pentru jocul curent
+    usedThisGame = false;
+}
+
+std::string Wizard::getName() const
+{
+    return name;
 }
 
 MagicPower Wizard::getPower() const {
@@ -180,4 +170,3 @@ Wizard Wizard::getRandomWizardDistinctFrom(const Wizard& otherWizard) {
 
     return randomWizard;
 }
-

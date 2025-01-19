@@ -1,52 +1,49 @@
 ﻿#include "GameState.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-json GameState::to_json() const {
-    return {
-        {"gameMode", gameMode},
-        {"board", board},
-        {"player1Hand", player1Hand},
-        {"player2Hand", player2Hand},
-        {"player1Score", player1Score},
-        {"player2Score", player2Score}
-    };
-}
+using json = nlohmann::json;
 
-GameState GameState::from_json(const json& j) {
-    GameState state;
-    j.at("gameMode").get_to(state.gameMode);
-    j.at("board").get_to(state.board);
-    j.at("player1Hand").get_to(state.player1Hand);
-    j.at("player2Hand").get_to(state.player2Hand);
-    j.at("player1Score").get_to(state.player1Score);
-    j.at("player2Score").get_to(state.player2Score);
-    return state;
-}
+void GameState::saveGame(const std::string& filename) const {
+    std::cout << "[DEBUG] Saving game to " << filename << "...\n";
 
-void saveGame(const GameState& gameState, const std::string& filename) {
+    json saveData;
+    saveData["game"] = game.toJson();  // Serializăm obiectul jocului
+
     std::ofstream file(filename);
-    if (file.is_open()) {
-        file << gameState.to_json().dump(4);  // Salvare JSON indentat
-        file.close();
-        std::cout << "✔ Progres salvat în " << filename << std::endl;
+    if (!file) {
+        std::cerr << "[ERROR] Failed to open save file!\n";
+        return;
     }
-    else {
-        std::cerr << "❌ Eroare la salvarea jocului!" << std::endl;
-    }
+
+    file << saveData.dump(4);
+    file.close();
+    std::cout << "[DEBUG] Game saved successfully!\n";
 }
 
-GameState loadGame(const std::string& filename) {
+GameState GameState::loadGame(const std::string& filename) {
     std::ifstream file(filename);
-    if (file.is_open()) {
-        json j;
-        file >> j;
+    if (!file) {
+        std::cerr << "[ERROR] No saved game found!\n";
+        return GameState(); // Returnează un joc nou dacă nu există salvare
+    }
+
+    json saveData;
+    try {
+        file >> saveData;
         file.close();
-        std::cout << "✔ Progres încărcat din " << filename << std::endl;
-        return GameState::from_json(j);
     }
-    else {
-        std::cerr << "⚠ Nu s-a găsit fișierul de salvare! Se va începe un joc nou." << std::endl;
-        return {}; // Returnează un GameState gol
+    catch (...) {
+        std::cerr << "[ERROR] Failed to parse savegame.json. Starting a new game.\n";
+        return GameState();
     }
+
+    std::cout << "[DEBUG] Loaded JSON: " << saveData.dump(4) << "\n";
+
+    GameState gameState;
+    gameState.game.fromJson(saveData["game"]);
+
+    std::cout << "[DEBUG] Game loaded successfully!\n";
+    return gameState;
 }
+
