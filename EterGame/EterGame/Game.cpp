@@ -513,6 +513,29 @@ void Game::start() {
 
 }
 
+void Game::calculateFinalScore() {
+    int score1 = board.calculateScore(player1);
+    int score2 = board.calculateScore(player2);
+
+    std::cout << "\n==============================\n";
+    std::cout << "        Final Scores          \n";
+    std::cout << "==============================\n";
+    std::cout << player1.getName() << ": " << score1 << " points\n";
+    std::cout << player2.getName() << ": " << score2 << " points\n";
+
+    if (score1 > score2) {
+        std::cout << "\n🏆 " << player1.getName() << " wins the game! 🎉\n";
+    }
+    else if (score2 > score1) {
+        std::cout << "\n🏆 " << player2.getName() << " wins the game! 🎉\n";
+    }
+    else {
+        std::cout << "\n🤝 The game is a tie! 🏳️\n";
+    }
+
+    std::cout << "==============================\n";
+}
+
 void Game::validateInput(int& row, int& col) {
     while (true) {
         std::cout << "Enter row and column (0-" << board.getSize() - 1 << "): ";
