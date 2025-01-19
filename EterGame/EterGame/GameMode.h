@@ -3,5 +3,6 @@
 enum class GameMode {
     Training,
     WizardsDuel,
-    ElementsDuel
+    ElementsDuel,
+    Tournament
 };

@@ -1,6 +1,7 @@
 //ExplosionPatterh.h
 
 #pragma once
+
 #include "GameBoard.h"
 #include <vector>
 #include <utility>

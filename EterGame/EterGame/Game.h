@@ -1,8 +1,8 @@
-﻿// Game.h
-
-#pragma once
+﻿#pragma once
 
 #include <string>
+#include <vector>
+#include <nlohmann/json.hpp>
 #include "GameBoard.h"
 #include "Player.h"
 #include "Wizard.h"
@@ -18,12 +18,23 @@ private:
     Player player2;
     int currentPlayer; // 1 pentru player1, 2 pentru player2
 
+    int currentRound;
+
     bool isWizardsDuel;
+    bool isElementalDuel;
+    bool isTournamentMode;
+
+    std::vector<std::vector<int>> battleArena;
+
+    int player1Markers;
+    int player2Markers;
 
     void validateInput(int& row, int& col);
     void validateCardIndex(int& index, const Player& player);
     void checkForExplosion(int lastMoveRow, int lastMoveCol); // Noua metodă pentru verificarea exploziei
 
+    void placeMarker(int row, int col, int player); // Plasare marker în Battle Arena
+    bool checkTournamentWin(int player); // Verifică victoria în turneu
 public:
     // Constructor
     Game(int boardSize,
@@ -39,7 +50,18 @@ public:
         const std::string& player2Name,
         GameMode mode);
 
+    // Funcții de serializare
+    nlohmann::json toJson() const;
+    void fromJson(const nlohmann::json& jsonData);
+
+    void startGame();
+    void saveGameState(const std::string& filename = "savegame.json") const;
+    //void saveGameState(const std::string& filename = "C:/Users/Public/savegame.json") const;
+    bool loadGameState(const std::string& filename = "savegame.json");
+    //bool loadGameState(const std::string& filename = "C:/Users/Public/savegame.json");
+
     // Metode
+    void startTournament();
     void resetPlayerHand(Player& player);
     void resetGame();
     int validateRowInput(const std::string& prompt);

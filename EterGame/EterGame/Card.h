@@ -10,10 +10,15 @@ public:
     bool isEther;
     std::string owner;
 
-    //Constructor
+    //Constructori
+    Card();
     Card(int value, bool isIllusion = false, bool isEther = false, const std::string& owner = "");
+    //Card(int value, bool isIllusion = false, bool isEther = false, const std::string& owner = "");
 
-    // Supraincarcare <<
+    void setOwner(const std::string& player);
+    std::string getOwner() const;
+    int getValue() const { return value; }
+    // Supraincarcare
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
     friend bool operator==(Card a, Card b);
 };
