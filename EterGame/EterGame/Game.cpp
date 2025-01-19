@@ -124,6 +124,22 @@ void Game::resetGame() {
     //std::cout << "Game reset. Ready for the next round!\n";
 }
 
+
+int Game::validateRowInput(const std::string& prompt)
+{
+    int row;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> row;
+        if (!std::cin.fail() && row >= 0 && row < board.getSize()) {
+            return row;
+        }
+        std::cout << "Invalid input. Try again.\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
 void Game::start() {
     while (true) {
         while (true) {
