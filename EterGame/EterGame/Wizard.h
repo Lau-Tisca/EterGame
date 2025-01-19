@@ -1,11 +1,14 @@
+//Wizard.h
+
 #pragma once
 
 class GameBoard;
+
 #include <string>
 #include "MagicPower.h"
 
-
-std::ostream& operator<<(std::ostream& os, const std::u8string& u8str);
+class Player;
+class GameBoard;
 
 class Wizard {
 public:
@@ -13,12 +16,18 @@ public:
     MagicPower power;
     bool usedThisGame;
     bool usedThisMatch;
-   
 
-    Wizard();
-    Wizard(const std::string name, MagicPower power);
+    //Constructor
+    Wizard(); //Constructor implicit
+    Wizard(const std::string& name, MagicPower power);
+
+    //Metode
+    // vechi - void useAbility(GameBoard& board, int row, int col, Player& currentPlayer, int destRow = -1, int destCol = -1);
     void useAbility(GameBoard& board, Player& currentPlayer, Player& opponent, int row = -1, int col = -1, int destRow = -1, int destCol = -1);
+
     void resetGame();
+
+    //Getteri
     std::string getName() const;
     MagicPower getPower() const;
     static Wizard getRandomWizard();
