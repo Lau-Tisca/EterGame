@@ -157,7 +157,55 @@ std::pair<int, int> Game::validateRowColInput(const std::string& prompt)
 
 bool Game::useWizardAbility(Player& activePlayer, Player& opponent)
 {
-    return false;
+    try {
+        int row, col, destRow, destCol;
+
+        switch (activePlayer.wizard.power) {
+        case MagicPower::REMOVE_ROW_WITH_OWN_CARD:
+            row = validateRowInput("Enter the row to remove: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, -1);
+            return true;
+
+        case MagicPower::REMOVE_OPPONENT_CARD_OVER_OWN:
+            std::tie(row, col) = validateRowColInput("Enter the row and column of the card to remove: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col);
+            return true;
+
+        case MagicPower::COVER_OPPONENT_CARD:
+            std::tie(row, col) = validateRowColInput("Enter the row and column of the opponent's card to cover: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col);
+            return true;
+
+        case MagicPower::CREATE_HOLE:
+            std::tie(row, col) = validateRowColInput("Enter the row and column of the empty space to transform into a hole: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col);
+            return true;
+
+        case MagicPower::MOVE_STACK_WITH_OWN_CARD:
+            std::tie(row, col) = validateRowColInput("Enter the source row and column of the stack to move: ");
+            std::tie(destRow, destCol) = validateRowColInput("Enter the destination row and column for the stack: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col, destRow, destCol);
+            return true;
+
+        case MagicPower::GAIN_EXTRA_CARD:
+            std::tie(row, col) = validateRowColInput("Enter the row and column to place the Ether card: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col);
+            return true;
+
+        case MagicPower::MOVE_STACK_WITH_OPPONENT_CARD:
+            std::tie(row, col) = validateRowColInput("Enter the source row and column of the opponent's stack to move: ");
+            std::tie(destRow, destCol) = validateRowColInput("Enter the destination row and column for the stack: ");
+            activePlayer.wizard.useAbility(board, activePlayer, opponent, row, col, destRow, destCol);
+            return true;
+
+        default:
+            std::cout << "Invalid wizard ability.\n";
+            return false;
+        }
+    }
+    catch (const std::exception& e) {
+        std::cout << e.what() << "\n";
+        return false;
 }
 
 void Game::start() {
