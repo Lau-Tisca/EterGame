@@ -43,6 +43,7 @@ public:
     void resetPlayerHand(Player& player);
     void resetGame();
     int validateRowInput(const std::string& prompt);
+    std::pair<int, int> validateRowColInput(const std::string& prompt);
     bool useWizardAbility(Player& activePlayer, Player& opponent);
     bool useElementalPower(Player& user, Player& opponent);
     void start();

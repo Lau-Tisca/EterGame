@@ -140,6 +140,26 @@ int Game::validateRowInput(const std::string& prompt)
     }
 }
 
+std::pair<int, int> Game::validateRowColInput(const std::string& prompt)
+{
+    int row, col;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> row >> col;
+        if (!std::cin.fail() && row >= 0 && row < board.getSize() && col >= 0 && col < board.getSize()) {
+            return { row, col };
+        }
+        std::cout << "Invalid input. Try again.\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+bool Game::useWizardAbility(Player& activePlayer, Player& opponent)
+{
+    return false;
+}
+
 void Game::start() {
     while (true) {
         while (true) {
