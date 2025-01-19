@@ -206,6 +206,38 @@ bool Game::useWizardAbility(Player& activePlayer, Player& opponent)
     catch (const std::exception& e) {
         std::cout << e.what() << "\n";
         return false;
+
+    }
+}
+
+bool Game::useElementalPower(Player& user, Player& opponent)
+{
+    if (!user.canUseElementalPower()) {
+        std::cout << user.getName() << " cannot use an elemental power at the moment.\n";
+        return false;
+    }
+
+    // Exemplu de utilizare a puterii: elimina o carte a oponentului
+    // Puteți extinde această logică pentru fiecare tip de putere
+    int row, col;
+    std::cout << "Enter the row and column of the opponent’s card to affect: ";
+    std::cin >> row >> col;
+
+    if (!board.isValidPosition(row, col, 0)) {
+        std::cout << "Invalid position. Elemental power failed.\n";
+        return false;
+    }
+
+    if (board.isOccupiedBy(opponent, row, col)) {
+        board.removeCard(row, col);
+        user.usePower();  // Marchez puterea ca folosită
+        std::cout << "Elemental power successfully used by " << user.getName() << ".\n";
+        return true;
+    }
+    else {
+        std::cout << "No opponent card at that position. Elemental power failed.\n";
+        return false;
+    }
 }
 
 void Game::start() {
